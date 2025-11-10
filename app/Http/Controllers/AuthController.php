@@ -3,9 +3,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
@@ -27,14 +29,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            $userRole = $user->getRoleNames()->first(); 
-
-            if ($userRole === 'Student') {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'The provided credentials do not match our records.',
-                ])->onlyInput('email');
-            }
+            $userData = User::find($user->id); 
 
             return Redirect::route('dashboard');
         }

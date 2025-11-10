@@ -5,7 +5,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { usePage } from '@inertiajs/inertia-react';
 import { usePermissions } from '../../utils/usePermissions';
 
-const RoleIndex = ({ roles }) => {
+const RoleIndex = ({ roles, pageTitle }) => {
     const { props } = usePage();
     const userPermissions = props.auth?.permissions || [];
 
@@ -13,11 +13,11 @@ const RoleIndex = ({ roles }) => {
     const [roleToDelete, setRoleToDelete] = useState(null);
 
     const columns = React.useMemo(() => [
-        { header: 'Name', field: 'name' },
-    ], []);
+        { header: "Name", field: 'name' },
+    ]);
 
     const { checkMenuPermissions } = usePermissions(userPermissions);
-    const { canCreate, canEdit, canDelete, canExport } = checkMenuPermissions('Roles');
+    const { canCreate, canEdit, canDelete } = checkMenuPermissions('Roles');
 
     const handleDeleteClick = useCallback((id) => {
         setRoleToDelete(id);
@@ -36,14 +36,15 @@ const RoleIndex = ({ roles }) => {
     }, [roleToDelete]);
 
     const RowActions = ({ rowId }) => (
-        <>
+        <div className="flex items-center space-x-2">
             {canEdit && (
                 <ButtonIcon
                     href={`/roles/${rowId}/edit`}
                     icon={<FaEdit />}
-                    iconColor="text-blue-500"
-                    hoverColor="hover:text-blue-700"
-                    tooltip="Edit"
+                    iconColor="text-gray-500"
+                    hoverColor="hover:text-gray-700"
+                    variant="icon" 
+                    tooltip={"Edit"}
                     size="lg"
                     shadow={true}
                 />
@@ -52,41 +53,47 @@ const RoleIndex = ({ roles }) => {
                 <ButtonIcon
                     onClick={() => handleDeleteClick(rowId)}
                     icon={<FaTrash />}
-                    iconColor="text-red-500"
-                    hoverColor="hover:text-red-700"
-                    tooltip="Delete"
+                    iconColor="text-gray-500"
+                    hoverColor="hover:text-gray-700"
+                    variant="icon" 
+                    tooltip={"Delete"}
                     size="lg"
                     shadow={true}
                 />
             )}
-        </>
+        </div>
     );
 
+
     return (
-        <div className="container mx-auto p-5 mt-5">
-            <div className="flex justify-between items-center mb-5">
-                <h1 className="text-3xl font-bold dark:text-white">Roles</h1>
+        <div className="container mx-auto">
+            <div className="flex justify-between items-center px-6 py-2 border-b border-gray-200">
+                <h1 className="text-lg font-semibold text-gray-800">
+                    {pageTitle}
+                </h1>
                 {canCreate && (
-                    <Link href="/roles/create" className="btn btn-primary">Add Role</Link>
+                    <Link href="/roles/create">+ New Role</Link>
                 )}
             </div>
 
-            <Table
-                columns={columns}
-                tableData={roles}
-                onPageChange={(page) => {
-                    Inertia.get(`/roles?page=${page}`, { preserveState: true });
-                }}
-                actions={(row) => <RowActions rowId={row.id} />}
-            />
+            <div className='px-6'>
+                <Table
+                    columns={columns}
+                    tableData={roles}
+                    onPageChange={(page) => {
+                        Inertia.get(`/roles?page=${page}`, { preserveState: true });
+                    }}
+                    actions={(row) => <RowActions rowId={row.id} />}
+                />
+            </div>
 
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onConfirm={handleDelete}
-                title="Confirm Delete"
-                message="Are you sure you want to delete this role?"
-                buttonText="Delete"
+                title={"Confirm Delete"}
+                message={"Are you sure you want to delete this record?"}
+                buttonText={"Delete"}
             />
         </div>
     );

@@ -1,71 +1,69 @@
 const Table = ({ columns, tableData, onPageChange, actions = null }) => {
-    if (!tableData || !tableData.data) {
-        return <div>Loading...</div>;
-    }
+    if (!tableData || !tableData.data) return <div>Loading...</div>;
 
     const handlePageChange = (page) => {
-        if (page >= 1 && page <= tableData.last_page) {
-            onPageChange(page);
-        }
+        if (page >= 1 && page <= tableData.last_page) onPageChange(page);
     };
 
-    const getNestedValue = (obj, field) => {
-        return field.split('.').reduce((acc, part) => (acc ? acc[part] : ''), obj);
-    };
+    const getNestedValue = (obj, field) =>
+        field.split('.').reduce((acc, part) => (acc ? acc[part] : ''), obj);
 
     return (
-        <div className="overflow-x-auto mt-5">
-            <div className="shadow-lg rounded-lg overflow-hidden bg-white dark:bg-secondary-dark-bg dark:text-white">
-                <div className="w-full overflow-x-auto custom-scroll">
-                    <table className="min-w-full xs:min-w-[600px] table-auto border-collapse">
-                        <thead className="bg-primary-theme-color text-white">
-                            <tr>
-                                <th className="px-4 py-3 text-left border-b border-gray-300">#</th>
+        <div className="mt-6">
+            <div className="bg-white rounded-xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.1)]">
+                {/* Table */}
+                <div className="overflow-x-auto">
+                    <table className="min-w-full border-collapse">
+                        {/* Header */}
+                        <thead className="bg-white border-b border-gray-200">
+                            <tr className="text-gray-700 text-sm">
+                                <th className="px-4 py-3 text-left font-medium">#</th>
                                 {columns.map((col, index) => (
-                                    <th
-                                        key={index}
-                                        className="px-4 py-3 text-left border-b border-gray-300"
-                                    >
+                                    <th key={index} className="px-4 py-3 text-left font-medium">
                                         {col.header}
                                     </th>
                                 ))}
                                 {actions && (
-                                    <th className="px-4 py-3 text-left border-b border-gray-300">
-                                        Actions
-                                    </th>
+                                    <th className="px-4 py-3 text-left font-medium">Actions</th>
                                 )}
                             </tr>
                         </thead>
-                        <tbody className="text-gray-700 dark:text-white">
+
+                        {/* Body */}
+                        <tbody>
                             {tableData.data.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan={columns.length + (actions ? 1 : 0)}
-                                        className="text-center py-4 text-gray-500 dark:text-gray-400"
+                                        colSpan={columns.length + (actions ? 2 : 1)}
+                                        className="text-center py-4 text-gray-500"
                                     >
                                         No data available
                                     </td>
                                 </tr>
                             ) : (
-                                tableData.data.map((row, rowIndex) => (
+                                tableData.data.map((row, i) => (
                                     <tr
-                                        key={rowIndex}
-                                        className={`hover:bg-gray-200 dark:hover:bg-gray-500 ${
-                                            rowIndex === tableData.data.length - 1 ? "" : "border-b border-gray-200"
+                                        key={i}
+                                        className={`hover:bg-gray-50 transition ${
+                                            i !== tableData.data.length - 1
+                                                ? "border-b border-gray-100"
+                                                : ""
                                         }`}
                                     >
-                                        <td className="px-4 py-2">
-                                            {tableData.from + rowIndex}
-                                        </td>           
-                                        {columns.map((col, colIndex) => (
-                                            <td key={colIndex} className="px-4 py-2">
+                                        <td className="px-4 py-3 text-gray-700">
+                                            {tableData.from + i}
+                                        </td>
+
+                                        {columns.map((col, j) => (
+                                            <td key={j} className="px-4 py-3 text-gray-700">
                                                 {col.render
                                                     ? col.render(row)
                                                     : getNestedValue(row, col.field) || ""}
                                             </td>
                                         ))}
+
                                         {actions && (
-                                            <td className="px-4 py-2 text-right flex gap-2">
+                                            <td className="px-4 py-3 text-gray-600">
                                                 {actions(row)}
                                             </td>
                                         )}
@@ -78,113 +76,36 @@ const Table = ({ columns, tableData, onPageChange, actions = null }) => {
 
                 {/* Pagination */}
                 {tableData.last_page > 1 && (
-                    <div className="flex justify-between items-center px-4 py-3 border-t border-gray-300">
-                        {/* Pagination Info */}
-                        <div className="text-sm text-gray-600 dark:text-white">
-                            Showing {tableData.from} to {tableData.to} of {tableData.total} results
-                        </div>
+                    <div className="flex justify-center items-center gap-2 py-4 border-t border-gray-100">
+                        <button
+                            onClick={() => handlePageChange(tableData.current_page - 1)}
+                            disabled={tableData.current_page === 1}
+                            className="px-2 py-1 text-gray-500 disabled:text-gray-300 hover:text-black"
+                        >
+                            &lt;
+                        </button>
 
-                        {/* Pagination Buttons */}
-                        <div className="flex">
-                            {/* Previous Page */}
+                        {[...Array(tableData.last_page)].map((_, i) => (
                             <button
-                                onClick={() => handlePageChange(tableData.current_page - 1)}
-                                disabled={tableData.current_page === 1}
-                                className={`px-2 py-1 border-t border-b border-l border-gray-300 rounded-l-md ${
-                                    tableData.current_page === 1
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-white text-gray-700 hover:bg-gray-100"
+                                key={i}
+                                onClick={() => handlePageChange(i + 1)}
+                                className={`px-3 py-1 rounded-md text-sm ${
+                                    tableData.current_page === i + 1
+                                        ? "bg-gray-200 text-gray-900"
+                                        : "text-gray-500 hover:bg-gray-100"
                                 }`}
                             >
-                                &lt;
+                                {i + 1}
                             </button>
+                        ))}
 
-                            {/* Page Numbers */}
-                            {(() => {
-                                const buttons = [];
-                                const totalPages = tableData.last_page;
-                                const currentPage = tableData.current_page;
-
-                                if (totalPages > 1) {
-                                    buttons.push(
-                                        <button
-                                            key={1}
-                                            onClick={() => handlePageChange(1)}
-                                            className={`px-3 py-1 border-t border-b border-l border-gray-300 ${
-                                                currentPage === 1
-                                                    ? "bg-gray-200 text-gray-800"
-                                                    : "bg-white text-gray-600 hover:bg-gray-100"
-                                            }`}
-                                        >
-                                            1
-                                        </button>
-                                    );
-                                }
-
-                                if (currentPage > 3) {
-                                    buttons.push(
-                                        <span key="start-ellipsis" className="px-3 py-1 border-t border-b border-l border-gray-300 text-gray-500">
-                                            ...
-                                        </span>
-                                    );
-                                }
-
-                                for (let page = Math.max(2, currentPage - 1); page <= Math.min(totalPages - 1, currentPage + 1); page++) {
-                                    buttons.push(
-                                        <button
-                                            key={page}
-                                            onClick={() => handlePageChange(page)}
-                                            className={`px-3 py-1 border-t border-b border-l border-gray-300 ${
-                                                currentPage === page
-                                                    ? "bg-gray-200 text-gray-800"
-                                                    : "bg-white text-gray-600 hover:bg-gray-100"
-                                            }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    );
-                                }
-
-                                if (currentPage < totalPages - 2) {
-                                    buttons.push(
-                                        <span key="end-ellipsis" className="px-3 py-1 border-t border-b border-l border-gray-300 text-gray-500">
-                                            ...
-                                        </span>
-                                    );
-                                }
-
-                                if (totalPages > 1) {
-                                    buttons.push(
-                                        <button
-                                            key={totalPages}
-                                            onClick={() => handlePageChange(totalPages)}
-                                            className={`px-3 py-1 border-t border-b border-l border-gray-300 ${
-                                                currentPage === totalPages
-                                                    ? "bg-gray-200 text-gray-800"
-                                                    : "bg-white text-gray-600 hover:bg-gray-100"
-                                            }`}
-                                        >
-                                            {totalPages}
-                                        </button>
-                                    );
-                                }
-
-                                return buttons;
-                            })()}
-
-                            {/* Next Page */}
-                            <button
-                                onClick={() => handlePageChange(tableData.current_page + 1)}
-                                disabled={tableData.current_page === tableData.last_page}
-                                className={`px-2 py-1 border border-gray-300 rounded-r-md ${
-                                    tableData.current_page === tableData.last_page
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-white text-gray-700 hover:bg-gray-100"
-                                }`}
-                            >
-                                &gt;
-                            </button>
-                        </div>
+                        <button
+                            onClick={() => handlePageChange(tableData.current_page + 1)}
+                            disabled={tableData.current_page === tableData.last_page}
+                            className="px-2 py-1 text-gray-500 disabled:text-gray-300 hover:text-black"
+                        >
+                            &gt;
+                        </button>
                     </div>
                 )}
             </div>

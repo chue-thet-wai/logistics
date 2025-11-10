@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { Inertia } from '@inertiajs/inertia';
-import { FormWrapper, Label, Input, Button } from '../../components';
+import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import useIsMobile from '@/utils/useIsMobile';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const Login = () => {
+    const isMobile = useIsMobile();
+    const { language } = useLanguage();
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -10,6 +15,7 @@ const Login = () => {
 
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -21,80 +27,118 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setProcessing(true); 
-        setErrors({}); 
+        setProcessing(true);
+        setErrors({});
 
         Inertia.post('/login', formData, {
             onError: (backendErrors) => {
-                setErrors(backendErrors); 
-                setProcessing(false); 
+                setErrors(backendErrors);
+                setProcessing(false);
             },
             onSuccess: () => {
-                setProcessing(false); 
+                setProcessing(false);
             },
         });
     };
 
-    return (
-        <div className="flex flex-col min-h-screen bg-primary-theme-color">
-            <div className="flex-grow flex items-center justify-center">
-                <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg">
-                    {/*
-                    <div className="flex justify-center mb-6">
-                        <img src="/logo.png" alt="Logo" className="h-12" />
-                    </div>
-                    */}
-                    <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Welcome EPS System</h1>
-                    <FormWrapper onSubmit={handleSubmit} shadow="shadow-none">
-                        <div className="mb-4">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Enter your email"
-                                error={errors.email}
-                            />
-                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-                        </div>
-                
-                        <div className="mb-4">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                name="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder="Enter your password"
-                                error={errors.password}
-                            />
-                            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-                        </div>
-                
-                        <div className="py-4">
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className={
-                                    "w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition duration-150 ease-in-out " +
-                                    (processing ? "opacity-50 cursor-not-allowed" : "")
-                                }
-                            >
-                                {processing ? 'Logging in...' : 'Login'}
-                            </Button>
-                        </div>
-                    </FormWrapper>
-                </div>
+    const renderForm = () => (
+        <form onSubmit={handleSubmit} className="w-full">
+            
+            <div className="relative mb-4">
+                <FiUser className="absolute left-3 top-3 text-gray-400 text-lg" />
+                <input
+                    type="email"
+                    name="email"
+                    placeholder={'Enter username'}
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400 text-gray-700"
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
-            {/* Footer */}
-            <footer className="text-center text-white py-4">
-                Created by Techy Solutions
-            </footer>
+
+           
+            <div className="relative mb-4">
+                <FiLock className="absolute left-3 top-3 text-gray-400 text-lg" />
+                <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    placeholder={'Enter password'}
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400 text-gray-700"
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            </div>
+
+            
+            <div className="flex items-center justify-between text-sm text-gray-600 mb-6">
+                <label className="flex items-center space-x-2">
+                    <input type="checkbox" className="accent-blue-600" />
+                    <span>{'Remember Me'}</span>
+                </label>
+            </div>
+
+           
+            <button
+                type="submit"
+                disabled={processing}
+                className={`w-full py-2 text-white bg-blue-600 rounded-lg font-semibold tracking-wide hover:bg-blue-700 transition ${
+                    processing ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+            >
+                {processing ? 'Logging in...' :  'Login'}
+            </button>
+            <div className="flex items-center justify-between text-sm text-gray-600 mt-4 mb-6">
+                <a href="/forgot-password" className="text-blue-600 hover:underline">
+                    { 'Forgot Password?'}
+                </a>
+            </div>
+        </form>
+    );
+
+    const renderMobileView = () => (
+        <div className="flex flex-col justify-center items-center bg-white min-h-screen px-4">
+            <div className="w-full max-w-sm mx-auto">
+                
+                <div className="flex justify-center mb-10">
+                    <img src="/superlight.png" alt="Logo" className="w-20 h-20 object-contain" />
+                </div>
+                {renderForm()}
+            </div>
+          
+            <div className="absolute bottom-4 w-full text-center text-gray-400 text-xs">
+                <span className="font-semibold text-gray-500">© Super Light Logistics 2025</span>
+            </div>
         </div>
     );
+
+    const renderDesktopView = () => (
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300">
+            
+            <div className="w-full max-w-md bg-white p-10 rounded-2xl shadow-2xl">
+                
+                <div className="flex justify-center mb-12">
+                    <img src="/superlight.png" alt="Logo" className="w-24 h-24 object-contain" />
+                </div>
+
+                {renderForm()}
+            </div>
+           
+            <div className="absolute bottom-4 w-full text-center text-gray-400 text-xs">
+                <span className="font-semibold text-gray-500">© Super Light Logistics 2025</span>
+            </div>
+        </div>
+    );
+
+    return isMobile ? renderMobileView() : renderDesktopView();
 };
 
 export default Login;

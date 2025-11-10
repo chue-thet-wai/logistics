@@ -14,13 +14,14 @@ const Button = ({
   hoverColor = '',
   focusColor = 'focus:ring-primary-theme-color',
   disabled = false,  // Add disabled prop
+  ...props
 }) => {
   
   const variantStyles = {
     primary: {
-      bgColor: 'bg-primary-theme-color',
+      bgColor: 'bg-sidebar-color',
       textColor: 'text-white', 
-      hoverColor: 'hover:bg-secondary-theme-color',
+      hoverColor: 'hover:bg-sidebar-color',
     },
     secondary: {
       bgColor: 'bg-gray-300',
@@ -63,6 +64,7 @@ const Button = ({
       onClick={disabled ? null : onClick}  
       className={baseStyles + " " + className}
       disabled={disabled}  
+      {...props}
     >
       {children}
     </button>

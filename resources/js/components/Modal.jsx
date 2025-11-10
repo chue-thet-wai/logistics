@@ -8,14 +8,14 @@ const Modal = ({
     title, 
     message, 
     buttonText = "Confirm",  
-    buttonColor = "bg-primary-theme-color",
+    buttonColor = "bg-sidebar-color",
     buttonDisabled = false,
     children 
 }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white dark:bg-secondary-dark-bg dark:text-white p-5 rounded-md shadow-md max-w-md w-full relative">
                 <button
                     onClick={onClose}
@@ -41,12 +41,13 @@ const Modal = ({
                         onClick={onClose}
                         variant="secondary"
                     >
-                        Cancel
+                        {"Cancel"}
                     </Button>
                     <Button
                         onClick={onConfirm}
                         bgColor={buttonColor}
                         disabled={buttonDisabled}
+                        data-testid="confirm-delete"
                     >
                         {buttonText}
                     </Button>

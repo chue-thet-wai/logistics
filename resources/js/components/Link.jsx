@@ -6,14 +6,15 @@ const Link = ({
   children,
   className = '',
   variant = 'primary',
-  padding = 'px-6 py-2',
+  padding = 'px-2 py-2',
   rounded = 'rounded-lg',
   textColor = 'text-white',
-  bgColor = 'bg-primary-theme-color',
-  hoverColor = 'hover:bg-secondary-theme-color',
-  focusColor = 'focus:ring-primary-theme-color',
+  bgColor = 'bg-sidebar-color',
+  hoverColor = 'hover:bg-sidebar-color',
+  focusColor = 'focus:ring-sidebar-color',
   target = '_self', 
 }) => {
+  
   const baseStyles = `
     ${padding} 
     ${rounded} 
@@ -27,6 +28,7 @@ const Link = ({
     transition 
     ease-in-out 
     duration-150
+    px-4
   `;
 
   return (

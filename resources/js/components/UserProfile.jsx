@@ -1,83 +1,74 @@
-import React, { useState } from "react";
-import { MdOutlineCancel } from "react-icons/md";
-import { FiUser } from "react-icons/fi";
+import React, { useRef } from "react";
+import { FiSettings, FiLogOut } from "react-icons/fi";
+import { MdClose } from "react-icons/md";
+import avatar from "../utils/avatar.jpg";
 import { Inertia } from "@inertiajs/inertia";
 import { useStateContext } from "../contexts/ContextProvider";
-import avatar from "../utils/avatar.jpg";
+import { useLanguage } from "../contexts/LanguageContext";
+import { translations } from "../utils/lang";
 
 const UserProfile = ({ user }) => {
-  const { currentColor, handleReset, currentMode, setMode } = useStateContext();
-  const [loading, setLoading] = useState(false); 
+  const profileRef = useRef();
+  const { handleReset } = useStateContext();
+  const { language } = useLanguage();
+  const t = translations[language]; 
 
   const handleLogout = () => {
-    setLoading(true); 
-    Inertia.post("/logout", {}, {
-      onSuccess: () => {
-        window.location.href = "/login"; 
-      },
-      onError: (error) => {
-        setLoading(false); 
-      },
-    });
+    Inertia.post("/logout");
+    handleReset();
   };
 
-  const handleEditProfile = () => {
+  const handleUserSettings = () => {
     handleReset();
-    Inertia.visit("/profile/edit"); 
+    Inertia.visit("/profile/edit");
   };
 
   return (
-    <div className="nav-item absolute right-1 top-16 bg-white dark:bg-[#42464D] p-8 rounded-lg w-96 shadow-lg">
-      <div className="flex justify-between items-center mb-6">
-        <p className="font-semibold text-lg dark:text-gray-200">User Profile</p>
-        <button
-          className="text-xl text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
-          onClick={handleReset}
-          aria-label="Close"
-        >
-          <MdOutlineCancel />
-        </button>
-      </div>
-
-      {/* User Information */}
-      <div className="flex gap-5 items-center border-b border-color pb-6">
-        <img className="rounded-full h-24 w-24" src={user?.avatar || avatar} alt="User profile" />
-        <div>
-          <p className="font-semibold text-xl dark:text-gray-200">{user?.name || "User"}</p>
-          <p className="text-gray-500 text-sm dark:text-gray-400">{user?.role || "Admin"}</p>
-          <p className="text-gray-500 text-sm font-semibold dark:text-gray-400">{user?.email || "info@techysolutions.com"}</p>
-        </div>
-      </div>
-
-      {/* My Profile Section */}
-      <div
-        className="flex gap-5 p-4 hover:bg-light-gray cursor-pointer dark:hover:bg-[#42464D] border-b border-color"
-        onClick={handleEditProfile}
-        aria-label="Edit Profile"
+    <div
+      ref={profileRef}
+      className="absolute right-4 top-14 w-64 bg-white rounded-md shadow-md z-50 text-sm"
+    >
+      {/* Close Button */}
+      <button
+        onClick={handleReset}
+        className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200"
+        aria-label={t.close || "Close profile"}
       >
-        <button
-          type="button"
-          className="text-xl rounded-lg p-3 hover:bg-light-gray"
-          aria-label="Profile Icon"
-        >
-          <FiUser />
-        </button>
-        <div>
-          <p className="font-semibold dark:text-gray-200">My Profile</p>
-          <p className="text-gray-500 text-sm dark:text-gray-400">Account Setting</p>
+        <MdClose className="text-gray-600" size={20} />
+      </button>
+
+      {/* User Info */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b">
+        <img
+          className="w-10 h-10 rounded-full object-cover"
+          src={user?.avatar || avatar}
+          alt="User"
+        />
+        <div className="leading-tight">
+          <p className="font-medium text-gray-800">{user?.name || t.admin}</p>
+          {user?.agent?.id && (
+            <p className="text-xs text-gray-500">
+              {t.agentId} {user.agent.agent_id}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Logout Button */}
-      <div className="mt-5">
+      {/* Actions */}
+      <div className="flex flex-col">
         <button
-          type="button"
-          className={`w-full py-2 rounded-md text-white bg-primary-theme-color ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-          onClick={handleLogout}
-          disabled={loading} 
-          aria-label="Logout"
+          onClick={handleUserSettings}
+          className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
         >
-          {loading ? "Logging out..." : "Logout"}
+          <FiSettings className="text-gray-600" />
+          <span>{t.userSetting}</span>
+        </button>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
+        >
+          <FiLogOut className="text-gray-600" />
+          <span>{t.logout}</span>
         </button>
       </div>
     </div>

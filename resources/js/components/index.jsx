@@ -11,6 +11,7 @@ export {default as Input} from './Input'
 export {default as Label} from './Label'
 export {default as Link} from './Link'
 export {default as Modal} from './Modal'
+export {default as Camera} from './Camera'
 export { default as Navbar } from './Navbar';
 export { default as Select } from './Select';
 export { default as Sidebar } from './Sidebar';

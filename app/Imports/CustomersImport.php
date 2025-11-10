@@ -28,7 +28,7 @@ class CustomersImport implements ToModel, WithHeadingRow
                 return null;
             }
         } else {
-            $cusId = $row['name'] . "-" . $dob;
+            $cusId = $row['name_en'] . "-" . $dob;
             $existingCusId = Customer::where('cus_id', $cusId)->first();
             if ($existingCusId) {
                 Log::info("Duplicate cus_id found, generated new cus_id: {$cusId}");
@@ -36,22 +36,33 @@ class CustomersImport implements ToModel, WithHeadingRow
             }
 
             $user = User::create([
-                'name' => $row['name'],
+                'name' => $row['name_en'],
                 'email' => $row['email'],
-                'password' => bcrypt($row['name'] . "-" . $dob),
+                'password' => bcrypt($row['name_en'] . "-" . $dob),
             ]);
             $user->assignRole('Customer');
             $customerID = generateCustomerID();
 
             return new Customer([
-                'user_id'      => $user->id,
-                'customer_id'  => $customerID,
-                'cus_id'       => $row['name'] . "-" . $dob,
-                'name'         => $row['name'],
-                'dob'          => $dob,
-                'phone'        => $row['phone'],
-                'expired_date' => $expiredDate,
-                'address'      => $row['address'],
+                'user_id'           => $user->id,
+                'customer_id'       => $customerID,
+                'cus_id'            => $row['name_en'] . "-" . $dob,
+                'name_mm'           => $row['name_mm'] ?? null,
+                'nationality'       => $row['nationality'] ?? null,
+                'dob'               => $dob,
+                'sex'               => $row['sex'] ?? null,
+                'nrc_no'            => $row['nrc_no'] ?? null,
+                'passport_no'       => $row['passport_no'] ?? null,
+                'passport_expiry'   => $this->formatDate($row['passport_expiry'] ?? null),
+                'visa_type'         => $row['visa_type'] ?? null,
+                'visa_expiry'       => $this->formatDate($row['visa_expiry'] ?? null),
+                'ci_no'             => $row['ci_no'] ?? null,
+                'ci_expiry'         => $this->formatDate($row['ci_expiry'] ?? null),
+                'pink_card_no'      => $row['pink_card_no'] ?? null,
+                'pink_card_expiry'  => $this->formatDate($row['pink_card_expiry'] ?? null),
+                'phone'             => $row['phone'],
+                'phone_secondary'   => $row['phone_secondary'] ?? null,
+                'address'           => $row['address'],
                 'created_by'   => Auth::id(),
             ]);
         }

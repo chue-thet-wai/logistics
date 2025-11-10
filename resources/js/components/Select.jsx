@@ -4,38 +4,43 @@ const Select = ({
   name,
   value = '',
   onChange,
-  options = [], 
+  options = [],
   placeholder = 'Select an option',
   className = '',
   borderColor = 'border-gray-300',
   focusColor = 'focus:ring-primary-theme-color',
   rounded = 'rounded-md',
   shadow = 'shadow-sm',
+  disabled = false,
+  error = '', 
 }) => {
+  const hasError = Boolean(error);
+
   const baseStyles = `
     w-full
     px-4 py-2
-    border ${borderColor}
+    border ${hasError ? 'border-red-500' : borderColor}
     ${rounded}
     ${shadow}
     focus:outline-none
     focus:ring-2
-    ${focusColor}
+    ${hasError ? 'focus:ring-red-500' : focusColor}
     transition
     duration-150
     ease-in-out
   `;
 
   return (
-    <div>
+    <div className="w-full">
       <select
-        name={name} 
+        name={name}
         value={value}
-        onChange={onChange} 
-        className={baseStyles+" "+className}
+        onChange={onChange}
+        disabled={disabled}
+        className={baseStyles + " " + className}
       >
         <option value="" disabled>
-          {placeholder} 
+          {placeholder}
         </option>
         {options.map((option, index) => (
           <option key={index} value={option.value}>
@@ -43,6 +48,7 @@ const Select = ({
           </option>
         ))}
       </select>
+      {hasError && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );
 };

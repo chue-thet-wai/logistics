@@ -17,13 +17,14 @@ export default {
                 14: '14px',
             },
             backgroundColor: {
-                'main-bg': '#EDF4F5',
+                'main-bg': '#ffffff',
                 'main-dark-bg': '#20232A',
                 'secondary-dark-bg': '#33373E',
                 'light-gray': '#F7F7F7',
                 'half-transparent': 'rgba(243, 228, 228, 0.55)',
-                'primary-theme-color': '#6b7280',
-                'secondary-theme-color': '#9399a5',
+                'primary-theme-color': '#F3F4F6',
+                'secondary-theme-color': '#ffffff',
+                'sidebar-color' : '#1e293b',
             },
             borderWidth: {
                 1: '1px',

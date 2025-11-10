@@ -1,65 +1,30 @@
 import React from 'react';
-import { FiUsers } from 'react-icons/fi';
-import { FaPassport, FaUser ,FaUserCheck  } from 'react-icons/fa';
-import { BsBoxSeam, BsFillPersonBadgeFill  } from 'react-icons/bs';
-import { RiDashboardLine } from 'react-icons/ri';
 
 export const links = [
     {
         title: 'Dashboard',
-        links: [
-            {
-                name: 'Dashboard',
-                route: 'dashboard',
-                icon: <RiDashboardLine />, 
-            },
-        ],
-    },
-
-    {
-        title: 'Setup',
-        links: [
-            {
-                name: 'Categories',
-                route: 'categories',
-                permission: 'View Categories',
-                icon: <BsBoxSeam />, 
-            }
-        ],
+        icon: "/assets/images/menu/dashboard.png",
+        route: 'dashboard',
     },
     {
         title: 'Management',
+        icon: "/assets/images/menu/setting.png", 
         links: [
-            {
-                name: 'Roles',
-                route: 'roles',
-                permission: 'View Roles',
-                icon: <BsFillPersonBadgeFill  />,
-            },
-            {
-                name: 'Users',
-                route: 'users',
-                permission: 'View Users',
-                icon: <FiUsers />, 
-            },
-            {
-                name: 'Services',
-                route: 'services',
-                permission: 'View Services',
-                icon: <FaPassport  />, 
-            },
-            {
-                name: 'Customers',
-                route: 'customers',
-                permission: 'View Customers',
-                icon: <FaUser />,
-            },
-            {
-                name: 'Customer Services',
-                route: 'customer-services',
-                permission: 'View Customer Services',
-                icon: <FaUserCheck  />,
-            },
+            { name: 'Roles',  route: 'roles', permission: 'View Roles' },
+            { name: 'Users',  route: 'users', permission: 'View Users' },
+            { name: 'Customers',  route: 'customers', permission: 'View Customers' },
+            { name: 'Drivers', route: 'drivers', permission: 'View Drivers' },
+            { name: 'Routes',  route: 'routes', permission: 'View Routes' },
         ],
     },
+    {
+        title: 'New Lead Creation',
+        icon: "/assets/images/menu/lead.png", 
+        route: 'leads',
+    },
+    {
+        title: 'Job Sheet Creation',
+        icon: "/assets/images/menu/lead.png", 
+        route: 'jobs',
+    }
 ];

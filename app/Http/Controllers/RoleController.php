@@ -15,14 +15,20 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::where('name', '!=', 'Customer')->paginate(config('common.paginate_per_page')); 
-        return Inertia::render('Roles/Index', ['roles' => $roles]);
+        return Inertia::render('Roles/Index', [
+            'roles' => $roles,
+            'pageTitle' => 'Roles'
+        ]);
     }
 
     
     public function create()
     {
         $permissions = Permission::all(); 
-        return Inertia::render('Roles/Form', ['permissions' => $permissions]);
+        return Inertia::render('Roles/Form', [
+            'permissions' => $permissions,
+            'pageTitle' => 'Create Role'
+        ]);
     }
 
    
@@ -52,7 +58,8 @@ class RoleController extends Controller
 
         return Inertia::render('Roles/Form', [
             'role' => $role,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'pageTitle'   => 'Edit Role'
         ]);
     }
 

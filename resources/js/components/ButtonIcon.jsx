@@ -6,33 +6,35 @@ const ButtonIcon = ({
   onClick,
   icon,
   iconColor = 'text-gray-500',
-  hoverColor = 'hover:text-gray-600',
-  tooltip = '', 
-  size = 'md', 
-  shadow = false, 
+  hoverColor = 'hover:text-gray-700',
+  tooltip = '',
+  size = 'md',
+  shadow = false,
+  variant = 'circle', // circle | icon
+  ...props
 }) => {
-  
+
   const sizeClasses = {
-    sm: 'w-6 h-6 p-1', 
-    md: 'w-8 h-8 p-2',
-    lg: 'w-10 h-10 p-3', 
+    sm: variant === 'circle' ? 'w-6 h-6 p-1' : 'text-sm',
+    md: variant === 'circle' ? 'w-8 h-8 p-2' : 'text-base',
+    lg: variant === 'circle' ? 'w-10 h-10 p-3' : 'text-lg',
   };
 
   const baseStyles = `
-    flex items-center justify-center rounded-full
-    transition-colors duration-200
-    ${sizeClasses[size]} 
-    ${iconColor} 
-    ${hoverColor} 
-    ${shadow ? 'shadow-md hover:shadow-lg' : ''} 
+    flex items-center justify-center
+    ${variant === 'circle' ? 'rounded-full transition-all duration-200' : ''}
+    ${sizeClasses[size]}
+    ${iconColor}
+    ${hoverColor}
+    ${shadow && variant === 'circle' ? 'shadow-md hover:shadow-lg' : ''}
   `;
 
-  const renderWithTooltip = (element) =>
+  const renderWithTooltip = (el) =>
     tooltip ? (
       <div className="relative group">
-        {element}
+        {el}
         <span className="
-          absolute bottom-10 left-1/2 -translate-x-1/2 text-xs text-white 
+          absolute bottom-7 left-1/2 -translate-x-1/2 text-xs text-white 
           bg-black px-1 py-1 rounded opacity-0 group-hover:opacity-100 
           transition-opacity duration-200
         ">
@@ -40,19 +42,19 @@ const ButtonIcon = ({
         </span>
       </div>
     ) : (
-      element
+      el
     );
 
   if (href) {
     return renderWithTooltip(
-      <Link href={href} className={baseStyles}>
+      <Link href={href} className={baseStyles} {...props}>
         {icon}
       </Link>
     );
   }
 
   return renderWithTooltip(
-    <button onClick={onClick} className={baseStyles}>
+    <button onClick={onClick} className={baseStyles} {...props}>
       {icon}
     </button>
   );

@@ -4,6 +4,7 @@ import { Tooltip } from 'react-tooltip';
 import { Navbar, Footer, Sidebar, ThemeSettings } from "../../components";
 import remembered, { themeParams } from '../../contexts/remembered';
 import { useStateContext } from '../../contexts/ContextProvider';
+import useIsMobile from '@/utils/useIsMobile';
 
 const AdminMain = ({ children }) => {
     const {
@@ -15,14 +16,14 @@ const AdminMain = ({ children }) => {
         currentMode,
     } = useStateContext();
     const { themep, setThemep, setColor, setMode } = themeParams();
+    const isMobile = useIsMobile(); 
 
     return (
         <div className={currentMode === 'Dark' ? 'dark' : ''}>
             <div className="flex relative dark:bg-main-dark-bg w-screen">
 
-                {/* Sidebar */}
                 {activeMenu ? (
-                    <div className="w-72 fixed z-[1500] sidebar dark:bg-secondary-dark-bg bg-white">
+                    <div className="w-64 fixed z-[1500] sidebar dark:bg-secondary-dark-bg bg-white">
                         <Sidebar />
                     </div>
                 ) : (
@@ -31,15 +32,16 @@ const AdminMain = ({ children }) => {
                     </div>
                 )}
 
-                {/* Main Content */}
                 <div
-                    className={`relative dark:bg-main-dark-bg bg-main-bg min-h-screen w-full ${activeMenu ? 'md:ml-72' : 'flex-2'}`}
+                className={`relative min-h-screen w-full 
+                    ${isMobile ? 'bg-white' : 'dark:bg-main-dark-bg bg-main-bg'} 
+                    ${activeMenu ? 'md:ml-64' : 'flex-2'}`}
                 >
                     <div className="sticky top-0 bg-main-bg dark:bg-main-dark-bg navbar">
                         <Navbar />
                     </div>
 
-                    <div>
+                    <div className='mt-16'>
                         {themeSettings && <ThemeSettings />}
                         {children}
                     </div>
@@ -49,4 +51,4 @@ const AdminMain = ({ children }) => {
     );
 };
 
-export default AdminMain;
+export default AdminMain; 

@@ -42,6 +42,12 @@ class HandleInertiaRequests extends Middleware
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'avatar' => $request->user()->avatar ?? asset('assets/images/profile.jpg'),
+                    'agent' => $request->user()->agent ?? [
+                        'biz_name' => '',
+                        'phone' => '',
+                        'address' => '',
+                        'location' => '',
+                    ],
                 ] : null,
                 'permissions' => $request->user()
                     ? $request->user()->getAllPermissions()->pluck('name')->toArray()

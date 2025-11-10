@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FormWrapper, Label, Input, Button } from '../../components';
 import { Inertia } from '@inertiajs/inertia';
+import useIsMobile from '@/utils/useIsMobile';
 
 const ProfileForm = ({ user }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,8 @@ const ProfileForm = ({ user }) => {
 
   const [errors, setErrors] = useState({});
   const [processing, setProcessing] = useState(false);
+  const isMobile = useIsMobile();
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,9 +24,10 @@ const ProfileForm = ({ user }) => {
     }));
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors({}); // Reset errors
+    setErrors({});
     setProcessing(true);
 
     Inertia.post('/profile/update', formData, {
@@ -31,45 +35,56 @@ const ProfileForm = ({ user }) => {
         setErrors(errorResponse);
         setProcessing(false);
       },
-      onSuccess: (response) => {
+      onSuccess: () => {
         setProcessing(false);
       },
     });
   };
 
+
   return (
-    <div className="m-10">
-      <h1 className="text-2xl font-bold mb-5 dark:text-white">Edit Profile</h1>
+    <div className="mx-4 my-6 sm:mx-10 sm:my-10">
+      <h1 className="text-2xl font-bold mb-6 dark:text-white">Edit Profile</h1>
 
       <FormWrapper onSubmit={handleSubmit}>
-        <div>
-          <Label htmlFor="name" required>Name</Label>
+        {/* Name */}
+        <div className="mb-4">
+          <Label htmlFor="name" required>
+            Name
+          </Label>
           <Input
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="Enter your name"
+            placeholder="Enter Your Name"
             error={errors.name}
           />
         </div>
 
-        <div>
-          <Label htmlFor="email" required>Email</Label>
+        {/* Email */}
+        <div className="mb-4">
+          <Label htmlFor="email" required>
+            Email
+          </Label>
           <Input
             id="email"
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="Enter your email"
+            placeholder="Enter Your Email"
             error={errors.email}
           />
         </div>
 
-        <div>
+        {/* Password */}
+        <div className="mb-4">
           <Label htmlFor="password">
-            Password <span className="text-xs text-gray-500">(leave blank to keep current password)</span>
+            Password{' '}
+            <span className="text-xs text-gray-500">
+              (Leave blank to keep current password)
+            </span>
           </Label>
           <Input
             id="password"
@@ -77,12 +92,13 @@ const ProfileForm = ({ user }) => {
             type="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="New password"
+            placeholder="New Password"
             error={errors.password}
           />
         </div>
 
-        <div>
+        {/* Confirm Password */}
+        <div className="mb-6">
           <Label htmlFor="password_confirmation">Confirm Password</Label>
           <Input
             id="password_confirmation"
@@ -90,19 +106,22 @@ const ProfileForm = ({ user }) => {
             type="password"
             value={formData.password_confirmation}
             onChange={handleChange}
-            placeholder="Confirm new password"
+            placeholder="Confirm New Password"
             error={errors.password_confirmation}
           />
         </div>
 
-        <div className="flex justify-end space-x-3 mt-4">
+        {/* Buttons */}
+        <div className="flex justify-end gap-3">
           <Button
+            type="button"
             onClick={() => Inertia.visit('/dashboard')}
             variant="secondary"
             disabled={processing}
           >
             Cancel
           </Button>
+
           <Button type="submit" disabled={processing}>
             {processing ? 'Updating...' : 'Update Profile'}
           </Button>

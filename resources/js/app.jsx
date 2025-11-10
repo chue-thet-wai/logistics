@@ -2,45 +2,35 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/inertia-react';
 import { InertiaProgress } from '@inertiajs/progress';
-import AdminMain from './Pages/Layouts/AdminMain'; 
-import AdminGuest from './Pages/Layouts/AdminGuest'; 
+import AppLayout from './Pages/Layouts/AppLayout';
 import { ContextProvider } from './contexts/ContextProvider';
+import { LanguageProvider } from './contexts/LanguageContext'; 
 
 InertiaProgress.init();
 
 createInertiaApp({
     resolve: async (name) => {
-        try {
-            // Dynamically resolve pages with nested paths
-            const pages = import.meta.glob('./Pages/**/*.jsx');
-            const page = pages[`./Pages/${name}.jsx`];
+        const pages = import.meta.glob('./Pages/**/*.jsx');
+        const page = pages[`./Pages/${name}.jsx`];
 
-            if (!page) {
-                throw new Error(`Page not found: ./Pages/${name}.jsx`);
-            }
+        if (!page) throw new Error(`Page not found: ./Pages/${name}.jsx`);
 
-            const module = await page();
+        const module = await page();
+        const Component = module.default;
 
-            if (['Auth/Login', 'Auth/Register'].includes(name)) {
-                module.default.layout = (page) =>
-                    <AdminGuest>{page}</AdminGuest>;
-            } else {
-                module.default.layout = (page) =>
-                    <AdminMain>{page}</AdminMain>;
-            }
+        Component.layout = Component.layout || ((page) => <AppLayout>{page}</AppLayout>);
 
-            return module;
-        } catch (error) {
-            console.error(`Error resolving page: ${name}`, error);
-            throw error;
-        }
+        return Component;
     },
+
     setup({ el, App, props }) {
         const root = createRoot(el);
         root.render(
             <ContextProvider>
-                <App {...props} />
+                <LanguageProvider>  
+                    <App {...props} />
+                </LanguageProvider>
             </ContextProvider>
         );
-    },
+    }
 });

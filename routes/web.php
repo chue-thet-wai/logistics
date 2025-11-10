@@ -1,11 +1,14 @@
 <?php
+
+
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\CustomerServiceController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\RouteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia; 
@@ -34,19 +37,16 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::middleware('check_permission')->group(function() {   
-        Route::resource('categories', CategoryController::class); 
+       
         Route::resource('roles', RoleController::class);
         Route::resource('users', UserController::class);
-        Route::resource('services', ServiceController::class);
-
-        Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
-        Route::get('/customers/export', [CustomerController::class, 'export'])->name('customers.export');
-        Route::post('customers/filter', [CustomerController::class, 'index'])->name('customers.filter');
         Route::resource('customers', CustomerController::class);
-
-        Route::get('/customer-services/export', [CustomerServiceController::class, 'export'])->name('customer-services.export');
-        Route::post('customer-services/filter', [CustomerServiceController::class, 'index'])->name('customer-services.filter');
-        Route::resource('customer-services', CustomerServiceController::class);
+        Route::resource('drivers', DriverController::class);
+        Route::resource('routes', RouteController::class);
+        Route::resource('leads', LeadController::class);
+        Route::post('leads/{id}/update', [LeadController::class, 'update'])->name('leads.update');
+        Route::resource('jobs', JobController::class);
+       
     });
     
 });

@@ -1,77 +1,173 @@
-import React from 'react';
-import { usePage, Link } from '@inertiajs/inertia-react';
-import { links } from '../utils/menu';
-import { MdOutlineCancel } from 'react-icons/md';
-import { Tooltip } from 'react-tooltip'; 
-import { useStateContext } from '../contexts/ContextProvider';
+import React, { useState } from "react";
+import { Link, usePage } from "@inertiajs/inertia-react";
+import { Inertia } from "@inertiajs/inertia";
+import { links } from "../utils/menu";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Sidebar = () => {
-    const { activeMenu, currentColor ,setactiveMenu } = useStateContext();
-    const { url, props } = usePage();
-    const userPermissions = props.auth?.permissions || [];
+  const { url, props } = usePage();
+  const userPermissions = props.auth?.permissions || [];
+  const [openSections, setOpenSections] = useState({});
+  const { language } = useLanguage();
 
-    const hasPermission = (permission) => {
-        return permission ? userPermissions.includes(permission) : true;
-    };
+  const hasPermission = (permission) =>
+    !permission || userPermissions.includes(permission);
 
-    const handleCloseSidebar = () => {
-        if (activeMenu && screenSize <= 900) {
-            setactiveMenu(false);
-        }
-    };
+  const isActive = (route) => (route ? url.startsWith(`/${route}`) : false);
 
-    const activeLink = 'flex items-center gap-5 pl-4 pt-2 pb-2 rounded-lg text-gray-700 text-md m-2';
-    const normalLink = 'flex items-center gap-5 pl-4 pt-2 pb-2 rounded-lg text-md text-white hover:text-gray-800 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2';
+  const toggleSection = (key) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
-    return (
-        <div className="h-screen overflow-auto bg-primary-theme-color pb-10">
-            {activeMenu && (
-                <>
-                    <div className="flex justify-between items-center">
-                        <Link
-                            href="/"
-                            onClick={handleCloseSidebar}
-                            className="items-center text-white sticky top-0 z-50 gap-3 ml-3 mt-4 flex text-xl font-extrabold tracking-tight dark:text-white text-slate-900"
-                        >
-                            <span>EPS System</span>
-                        </Link>
-                        <button
-                            type="button"
-                            onClick={() => setactiveMenu(!activeMenu)}
-                            data-tooltip-id="menu-tooltip" // Updated tooltip
-                            className="text-xl rounded-full p-3 hover:bg-light-gray mt-4 block md:hidden"
-                        >
-                            <MdOutlineCancel />
-                        </button>
-                        <Tooltip id="menu-tooltip" place="bottom" content="Menu" />
-                    </div>
-                    <div className="mt-10">
-                        {links.map((section) => {
-                            const visibleLinks = section.links.filter(link => hasPermission(link.permission));
-                            if (visibleLinks.length === 0) return null;
+  const handleLogout = () => {
+    Inertia.post("/logout");
+  };
 
-                            return (
-                                <div key={section.title}>
-                                    <p className="text-white m-3 mt-4 uppercase">{section.title}</p>
-                                    {visibleLinks.map(link => (
-                                        <Link
-                                            href={`/${link.route}`}
-                                            key={link.name}
-                                            style={{ backgroundColor: url === `/${link.route}` ? currentColor : '' }}
-                                            className={url === `/${link.route}` ? activeLink : normalLink}
-                                        >
-                                            {link.icon}
-                                            <span className="capitalize">{link.name}</span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </>
-            )}
+  const renderSubLinks = (subLinks, parentKey = "") => {
+    return subLinks.map((link, idx) => {
+      if (!hasPermission(link.permission)) return null;
+
+      const hasChildren = link.links && link.links.length > 0;
+      const key = `${parentKey}-${idx}`;
+      const isOpen = openSections[key];
+
+      return (
+        <div key={key}>
+          {hasChildren ? (
+            <button
+              onClick={() => toggleSection(key)}
+              className={`flex justify-between items-center w-full py-2 px-4 rounded-md text-sm transition-all ${
+                isActive(link.route)
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
+              }`}
+            >
+              <span>{link.name}</span>
+              <span>{isOpen ? "▾" : "▸"}</span>
+            </button>
+          ) : (
+            <Link
+              href={`/${link.route}`}
+              className={`block py-2 px-4 rounded-md text-sm transition-all ${
+                isActive(link.route)
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
+              }`}
+            >
+              {link.name}
+            </Link>
+          )}
+
+          {hasChildren && isOpen && (
+            <div className="ml-4 border-l border-gray-700">
+              {renderSubLinks(link.links, key)}
+            </div>
+          )}
         </div>
-    );
+      );
+    });
+  };
+
+  return (
+    <aside className="fixed top-14 left-0 z-40 h-[calc(100vh-3.5rem)] w-64 bg-gray-900 text-gray-200 shadow-xl">
+      {/* Logo */}
+      <div className="flex items-center justify-center h-16 border-b border-gray-700 px-5">
+        <Link
+          href="/"
+          className="flex items-center gap-3 text-lg font-semibold text-white tracking-wide"
+        >
+          <img
+            src="/assets/images/menu/truck.png"
+            alt="Logo"
+            className="w-8 h-8 object-contain"
+          />
+          <span>Super Light Logistic</span>
+        </Link>
+      </div>
+
+      {/* Menu */}
+      <div className="flex flex-col h-[calc(100%-4rem)]">
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+          {links.map((section, idx) => {
+            const sectionKey = `section-${idx}`;
+
+            // Check if section has a direct route
+            if (section.route) {
+              if (!hasPermission(section.permission)) return null;
+              return (
+                <Link
+                  key={sectionKey}
+                  href={`/${section.route}`}
+                  className={`flex items-center gap-3 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                    isActive(section.route)
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  }`}
+                >
+                  {typeof section.icon === "string" ? (
+                    <img
+                      src={section.icon}
+                      alt={section.title}
+                      className="w-5 h-5 object-contain"
+                    />
+                  ) : (
+                    section.icon
+                  )}
+                  {section.title}
+                </Link>
+              );
+            }
+
+            // Section with sub-links
+            const visibleLinks =
+              section.links?.filter((l) => hasPermission(l.permission)) || [];
+            if (visibleLinks.length === 0) return null;
+
+            const isOpen = openSections[sectionKey];
+
+            return (
+              <div key={sectionKey}>
+                <button
+                  onClick={() => toggleSection(sectionKey)}
+                  className="w-full flex items-center justify-between py-2 px-3 rounded-md text-sm font-semibold text-gray-100 hover:bg-gray-700 transition-all"
+                >
+                  <span className="flex items-center gap-2">
+                    {typeof section.icon === "string" ? (
+                      <img
+                        src={section.icon}
+                        alt={section.title}
+                        className="w-5 h-5 object-contain"
+                      />
+                    ) : (
+                      section.icon
+                    )}
+                    {section.title}
+                  </span>
+                  <span className="text-xs">{isOpen ? "▾" : "▸"}</span>
+                </button>
+
+                {isOpen && (
+                  <div className="mt-1 space-y-1 pl-3 border-l border-gray-700">
+                    {renderSubLinks(visibleLinks, sectionKey)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Logout */}
+        <div className="border-t border-gray-700 p-4">
+          <button
+            onClick={handleLogout}
+            className="block w-full text-left text-sm text-gray-300 hover:text-red-400"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
 };
 
 export default Sidebar;

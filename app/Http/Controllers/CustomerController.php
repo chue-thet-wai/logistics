@@ -2,97 +2,86 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\CustomersExport;
-use App\Imports\CustomersImport;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Excel as ExcelType;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request)
+
+    public function index()
     {
-        $authUser = auth()->user();
-        $query = Customer::with('user');
-
-        if ($request->filled('customer_id')) {
-            $query->where('customer_id', 'like', '%' . $request->customer_id . '%');
-        }
-    
-        if ($request->filled('name')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->name . '%');
-            });
-        }
-    
-        if ($request->filled('phone')) {
-            $query->where('phone', 'like', '%' . $request->phone . '%');
-        }
-
-        $query->where('created_by',$authUser->id);
-
-        $customers = $query->paginate(config('common.paginate_per_page'))->appends($request->all());
+        $customers = Customer::with('user')
+            ->paginate(config('common.paginate_per_page'));
 
         return Inertia::render('Customers/Index', [
             'customers' => $customers,
-            'filters' => $request->only(['name', 'email', 'phone']),
+            'pageTitle' => 'Customers',
         ]);
     }
 
-
+    
     public function create()
     {
         return Inertia::render('Customers/Form', [
-            'statuses' => config('common.statuses'),
+            'pageTitle' => 'Create Customer',
         ]);
     }
 
+   
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:20',
-            'dob' => 'nullable|date',
-            'expired_date' => 'nullable|date',
-            'address' => 'string',
+            'phone' => 'nullable|string|max:20',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'zip_code' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
         ]);
 
-        // Create user
+       
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->name."-".$request->dob),
+            'password' => Hash::make('customer'),
+            'created_by' => auth()->id(),
         ]);
 
-        // Assign role if using spatie roles
         $user->assignRole('Customer');
 
-        // Create customer linked to user
-        $customerID = generateCustomerID();
-        $user->customer()->create([
-            'customer_id' => $customerID,
-            'cus_id'      => $request->name."-".$request->dob,
-            'phone'       => $request->phone,
-            'dob'         => $request->dob,
-            'expired_date'=> $request->expired_date,
-            'address'     => $request->address,
-            'created_by'  => Auth::id(),
+        $lastCustomer = Customer::orderBy('id', 'desc')->first();
+        $nextId = $lastCustomer ? $lastCustomer->id + 1 : 1;
+        $cus_id = 'CUS-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+
+        Customer::create([
+            'user_id' => $user->id,
+            'cus_id' => $cus_id,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'city' => $request->city,
+            'state' => $request->state,
+            'country' => $request->country,
+            'zip_code' => $request->zip_code,
+            'address' => $request->address,
+            'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
+        return redirect()->route('customers.index')->with('success', 'Customer created successfully!');
     }
 
     public function edit(Customer $customer)
     {
+        $customer->load('user');
+
         return Inertia::render('Customers/Form', [
-            'customer' => $customer->load('user'),
+            'customer' => $customer,
+            'pageTitle' => 'Edit Customer',
         ]);
     }
 
@@ -101,73 +90,45 @@ class CustomerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $customer->user_id,
-            'phone' => 'required|string|max:20',
-            'dob' => 'nullable|date',
-            'expired_date' => 'nullable|date',
-            'address' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'zip_code' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
         ]);
 
-        // Update user
-        $customer->user->update([
+        $user = $customer->user;
+        $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'updated_by' => auth()->id(),
         ]);
 
-        // Update customer
         $customer->update([
-            'cus_id'      => $request->name."-".$request->dob,
-            'phone'       => $request->phone,
-            'dob'         => $request->dob,
-            'expired_date'=> $request->expired_date,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'city' => $request->city,
+            'state' => $request->state,
+            'country' => $request->country,
+            'zip_code' => $request->zip_code,
             'address' => $request->address,
-            'updated_by' => Auth::id(),
+            'updated_by' => auth()->id(),
         ]);
 
-        return redirect()->route('customers.index')->with('success', 'Customer updated successfully.');
+        return redirect()->route('customers.index')->with('success', 'Customer updated successfully!');
     }
 
     public function destroy(Customer $customer)
     {
-        $customer->user()->delete();
-        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
-    }
+        $user = $customer->user;
+        $customer->delete();
 
-    public function import(Request $request)
-    {
-        $request->validate([
-           //'file' => 'required|mimes:csv,xlsx,xls|max:2048',
-        ]);
-
-        Excel::import(new CustomersImport, $request->file('file'));
-
-        return back()->with('success', 'Customers imported successfully.');
-    }
-
-    public function export(Request $request)
-    {
-        $authUser = auth()->user();
-
-        $query = Customer::with('user');
-    
-        if ($request->filled('customer_id')) {
-            $query->where('customer_id', 'like', '%' . $request->customer_id . '%');
+        if ($user) {
+            $user->delete();
         }
-    
-        if ($request->filled('name')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->name . '%');
-            });
-        }
-    
-        if ($request->filled('phone')) {
-            $query->where('phone', 'like', '%' . $request->phone . '%');
-        }
-    
-        $query->where('created_by',$authUser->id);
-        $customers = $query->get();
-    
-        return Excel::download(new CustomersExport($customers), 'customers.csv', ExcelType::CSV);
-    }
-    
 
+        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully!');
+    }
 }
