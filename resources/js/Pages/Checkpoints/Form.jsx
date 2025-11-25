@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Inertia } from '@inertiajs/inertia';
-import { FormWrapper, Label, Input, Textarea, Select, Button, Link } from '../../components';
+import { FormWrapper, Label, Input, Textarea, Select, Button } from '../../components';
 
-const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
+const CheckpointForm = ({ checkpoint = null, route = null, checkpoint_types=null, pageTitle }) => {
     const [formData, setFormData] = useState({
-        name: route?.name || "",
-        origin: route?.origin || "",
-        destination: route?.destination || "",
-        total_distance: route?.total_distance || "",
-        estimate_duration: route?.estimate_duration || "",
-        status: route?.status ?? 0,
-        remark: route?.remark || "",
+        name: checkpoint?.name || "",
+        route_id: checkpoint?.route_id || route?.id || "",
+        type: checkpoint?.type || "",
+        eta: checkpoint?.eta || "",
+        latitude: checkpoint?.latitude || "",
+        longitude: checkpoint?.longitude || "",
+        remark: checkpoint?.remark || "",
     });
 
     const [errors, setErrors] = useState({});
@@ -26,8 +26,8 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
         setProcessing(true);
         setErrors({});
 
-        const method = route ? "put" : "post";
-        const url = route ? `/routes/${route.id}` : "/routes";
+        const method = checkpoint ? "put" : "post";
+        const url = checkpoint ? `/routes/${route.id}/checkpoints/${checkpoint.id}` : `/routes/${route.id}/checkpoints`;
 
         Inertia[method](url, formData, {
             onError: (err) => {
@@ -36,7 +36,7 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
             },
             onSuccess: () => {
                 setProcessing(false);
-                Inertia.visit("/routes");
+                Inertia.visit(`/routes/${formData.route_id}/checkpoints`);
             }
         });
     };
@@ -46,11 +46,6 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
             {/* Page Header */}
             <div className="flex justify-between items-center h-14 px-6 py-2 border-b border-gray-200">
                 <h1 className="text-lg font-semibold text-gray-800">{pageTitle}</h1>
-                {route && (
-                    <Link href={`/routes/${route.id}/checkpoints`}>
-                        Checkpoints
-                    </Link>
-                )}
             </div>
 
             <div className="p-6">
@@ -69,67 +64,54 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
                             />
                         </div>
 
-                        {/* Origin */}
+                        {/* Type */}
                         <div>
-                            <Label htmlFor="origin">Origin</Label>
-                            <Input
-                                id="origin"
-                                name="origin"
-                                value={formData.origin}
-                                onChange={handleChange}
-                                error={errors.origin}
-                            />
-                        </div>
-
-                        {/* Destination */}
-                        <div>
-                            <Label htmlFor="destination">Destination</Label>
-                            <Input
-                                id="destination"
-                                name="destination"
-                                value={formData.destination}
-                                onChange={handleChange}
-                                error={errors.destination}
-                            />
-                        </div>
-
-                        {/* Distance */}
-                        <div>
-                            <Label htmlFor="total_distance">Total Distance</Label>
-                            <Input
-                                id="total_distance"
-                                name="total_distance"
-                                value={formData.total_distance}
-                                onChange={handleChange}
-                                error={errors.total_distance}
-                            />
-                        </div>
-
-                        {/* Duration */}
-                        <div>
-                            <Label htmlFor="estimate_duration">Estimate Duration</Label>
-                            <Input
-                                id="estimate_duration"
-                                name="estimate_duration"
-                                value={formData.estimate_duration}
-                                onChange={handleChange}
-                                error={errors.estimate_duration}
-                            />
-                        </div>
-
-                        {/* Status */}
-                        <div>
-                            <Label htmlFor="status">Status</Label>
+                            <Label htmlFor="type">Type</Label>
                             <Select
-                                id="status"
-                                name="status"
-                                value={formData.status}
+                                id="type"
+                                name="type"
+                                value={formData.type}
                                 onChange={handleChange}
-                                options={statuses}
-                                placeholder="Select Status"
-                                aria-invalid={!!errors.status}
-                                aria-describedby="status-error"
-                                error={errors.status}
+                                options={checkpoint_types}
+                                aria-invalid={!!errors.type}
+                                aria-describedby="type-error"
+                                error={errors.type}
+                            />
+                        </div>
+
+                        {/* ETA */}
+                        <div>
+                            <Label htmlFor="eta">ETA</Label>
+                            <Input
+                                id="eta"
+                                name="eta"
+                                value={formData.eta}
+                                onChange={handleChange}
+                                error={errors.eta}
+                            />
+                        </div>
+
+                        {/* Latitude */}
+                        <div>
+                            <Label htmlFor="latitude">Latitude</Label>
+                            <Input
+                                id="latitude"
+                                name="latitude"
+                                value={formData.latitude}
+                                onChange={handleChange}
+                                error={errors.latitude}
+                            />
+                        </div>
+
+                        {/* Longitude */}
+                        <div>
+                            <Label htmlFor="longitude">Longitude</Label>
+                            <Input
+                                id="longitude"
+                                name="longitude"
+                                value={formData.longitude}
+                                onChange={handleChange}
+                                error={errors.longitude}
                             />
                         </div>
 
@@ -149,7 +131,7 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
                     {/* Buttons */}
                     <div className="flex justify-end space-x-3 mt-4">
                         <Button
-                            onClick={() => Inertia.visit("/routes")}
+                            onClick={() => Inertia.visit(`/routes/${formData.route_id}/checkpoints`)}
                             variant="secondary"
                             disabled={processing}
                         >
@@ -166,4 +148,4 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
     );
 };
 
-export default RouteForm;
+export default CheckpointForm;

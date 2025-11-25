@@ -17,20 +17,14 @@ class LeadController extends Controller
 
     public function index()
     {
-        $lead_statuses = config('common.lead_statuses');
-        $statusMap = collect($lead_statuses)->pluck('label', 'value');
 
         $leads = Lead::with('customer')
             ->orderBy('id', 'desc')
             ->paginate(config('common.paginate_per_page', 10));
 
-        $leads->getCollection()->transform(function ($lead) use ($statusMap) {
-            $lead->status_label = $statusMap[$lead->status] ?? 'Unknown';
-            return $lead;
-        });
-
         return Inertia::render('Leads/Index', [
-            'leads' => $leads,
+            'leads'     => $leads,
+            'statuses'  => config('common.lead_statuses'),
             'pageTitle' => 'Leads'
         ]);
     }
@@ -57,7 +51,6 @@ class LeadController extends Controller
             'category' => 'nullable|string|max:255',
             'bl_number' => 'nullable|string|max:255',
             'free_day' => 'nullable|integer|min:0',
-            'files.*' => 'nullable|file|max:20480',
         ]);
 
         if (!$request->booking_id) {
@@ -74,27 +67,35 @@ class LeadController extends Controller
 
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $file) {
-                    $path = $file->store('lead_files', 'public');
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) 
+                            . '_' . $lead->booking_id . '.' . $extension;
+
+                    $path = $file->storeAs("logistics/lead_documents", $filename, 's3');
+
                     LeadFile::create([
                         'lead_id' => $lead->id,
                         'file_path' => $path,
-                        'file_type' => $file->getClientOriginalExtension(),
+                        'file_type' => $extension,
                     ]);
                 }
             }
 
             if ($action === 'confirm') {
+                $shipment_id = 'SHP-' . time();
                 Job::create([
                     'booking_id' => $lead->booking_id,
+                    'shipment_id' => $lead->shipment_id,
                     'cus_id' => $lead->cus_id,
                     'mode' => $lead->mode,
-                    'shipment_category' => $lead->category,
+                    'category' => $lead->category,
                     'containers' => $lead->containers,
                     'eta' => $lead->eta,
                     'bl_number' => $lead->bl_number,
-                    'free_days' => $lead->free_day,
+                    'free_day' => $lead->free_day,
                     'created_by' => auth()->id(),
                 ]);
+
             }
         });
 
@@ -130,10 +131,9 @@ class LeadController extends Controller
             'category' => 'nullable|string|max:255',
             'bl_number' => 'nullable|string|max:255',
             'free_day' => 'nullable|integer|min:0',
-            'files.*' => 'nullable|file|max:20480',
         ]);
 
-        $validated['status'] = $action === 'confirm' ? 1 : 0;
+        $validated['status'] = $action === 'confirm' ? '1' : '0';
         $validated['updated_by'] = auth()->id();
 
         DB::transaction(function () use ($lead, $validated, $request, $action) {
@@ -141,29 +141,36 @@ class LeadController extends Controller
 
             if ($request->hasFile('files')) {
                 foreach ($request->file('files') as $file) {
-                    $path = $file->store('lead_files', 'public');
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) 
+                            . '_' . $lead->booking_id . '.' . $extension;
+
+                    $path = $file->storeAs("logistics/lead_documents", $filename, 's3');
+
                     LeadFile::create([
                         'lead_id' => $lead->id,
                         'file_path' => $path,
-                        'file_type' => $file->getClientOriginalExtension(),
+                        'file_type' => $extension,
                     ]);
                 }
             }
 
             if ($action === 'confirm') {
                 Job::updateOrCreate(
-                    ['booking_id' => $lead->booking_id], 
+                    ['booking_id' => $lead->booking_id],
                     [
+                        'shipment_id' => $lead->job->shipment_id ?? 'SHP-' . time(),
                         'cus_id' => $lead->cus_id,
                         'mode' => $lead->mode,
-                        'shipment_category' => $lead->category,
+                        'category' => $lead->category,
                         'containers' => $lead->containers,
                         'eta' => $lead->eta,
                         'bl_number' => $lead->bl_number,
-                        'free_days' => $lead->free_day,
-                        'created_by' => auth()->id(),
+                        'free_day' => $lead->free_day,
+                        'updated_by' => auth()->id(),
                     ]
                 );
+
             }
         });
 
@@ -177,11 +184,12 @@ class LeadController extends Controller
     public function destroy(Lead $lead)
     {
        
-        foreach ($lead->files as $file) {
-            if ($file->file_path && Storage::disk('public')->exists($file->file_path)) {
-                Storage::disk('public')->delete($file->file_path);
+        foreach ($lead->files as $file) 
+        {
+            if ($file->file_path && Storage::disk('s3')->exists($file->file_path)) {
+                Storage::disk('s3')->delete($file->file_path);
             }
-            $file->delete(); 
+            $file->delete();
         }
 
         $lead->delete();

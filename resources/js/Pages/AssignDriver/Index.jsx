@@ -4,7 +4,7 @@ import { usePage } from "@inertiajs/inertia-react";
 import { Link, Table, Modal, ButtonIcon } from "../../components";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
-const JobIndex = ({ jobs, statuses=[], categories=[], pageTitle }) => {
+const AssignDriverIndex = ({ jobs, statuses=[], categories=[], pageTitle }) => {
     const { props } = usePage();
     const userPermissions = props.auth?.permissions || [];
 
@@ -66,7 +66,7 @@ const JobIndex = ({ jobs, statuses=[], categories=[], pageTitle }) => {
         <div className="flex items-center space-x-2">
             {canView && (
                 <ButtonIcon
-                    href={`/jobs/${rowId}`}
+                    href={`/assign-driver/${rowId}`}
                     icon={<FaEye />}
                     tooltip="View"
                     iconColor="text-gray-500"
@@ -78,7 +78,7 @@ const JobIndex = ({ jobs, statuses=[], categories=[], pageTitle }) => {
             )}
             {canEdit && (
                 <ButtonIcon
-                    href={`/jobs/${rowId}/edit`}
+                    href={`/assign-driver/${rowId}/edit`}
                     icon={<FaEdit />}
                     tooltip="Edit"
                     iconColor="text-gray-500"
@@ -137,4 +137,4 @@ const JobIndex = ({ jobs, statuses=[], categories=[], pageTitle }) => {
     );
 };
 
-export default JobIndex;
+export default AssignDriverIndex;

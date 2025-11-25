@@ -5,7 +5,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { usePage } from '@inertiajs/inertia-react';
 import { usePermissions } from '../../utils/usePermissions';
 
-const Index = ({ customers, pageTitle }) => {
+const Index = ({ customers, statuses = [], customer_types=[] ,pageTitle }) => {
     const { props } = usePage();
     const userPermissions = props.auth?.permissions || [];
 
@@ -18,9 +18,27 @@ const Index = ({ customers, pageTitle }) => {
     const columns = React.useMemo(() => [
         { header: "Customer ID", field: 'cus_id' },
         { header: "Name", field: 'name' },
-        { header: "Email", field: 'email' },
+        {
+            header: "Type",
+            field: 'customer_type',
+            render: (row) => {
+                const type = customer_types.find(s => s.value === row.customer_type);
+                return type ? type.label : row.customer_type;
+            },
+        },
+        { header: "Country", field: 'billing_country' },
+        { header: "Contact Person", field: 'contact_person' },
         { header: "Phone", field: 'phone' },
-        { header: "City", field: 'city' },
+        { header: "Email", field: 'email' },
+        { header: "Credit Limit", render: (row) => `${row.credit_limit} ${row.currency}` },
+        {
+            header: "Status",
+            field: 'status',
+            render: (row) => {
+                const status = statuses.find(s => s.value === row.status);
+                return status ? status.label : row.status;
+            },
+        },
     ], []);
 
     const handleDeleteClick = useCallback((id) => {

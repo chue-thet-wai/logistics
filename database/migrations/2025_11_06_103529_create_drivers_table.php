@@ -18,11 +18,13 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('email')->unique()->nullable();
             $table->string('phone')->nullable();
-            $table->string('city')->nullable();
-            $table->string('state')->nullable();
-            $table->string('country')->nullable();
-            $table->string('zip_code')->nullable();
-            $table->text('address')->nullable();
+            $table->string('truck_number')->nullable();
+            $table->string('vehicle_type')->nullable();
+            $table->string('status')->nullable();
+            $table->string('route')->nullable();
+            $table->string('checkpoint')->nullable();
+            $table->boolean('available')->default(1);// 1 = Available, 0 = Busy
+            $table->text('remark')->nullable();
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->unsignedBigInteger('updated_by')->nullable()->index();
 

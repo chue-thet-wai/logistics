@@ -13,8 +13,8 @@ export const links = [
             { name: 'Roles',  route: 'roles', permission: 'View Roles' },
             { name: 'Users',  route: 'users', permission: 'View Users' },
             { name: 'Customers',  route: 'customers', permission: 'View Customers' },
-            { name: 'Drivers', route: 'drivers', permission: 'View Drivers' },
             { name: 'Routes',  route: 'routes', permission: 'View Routes' },
+            { name: 'Drivers', route: 'drivers', permission: 'View Drivers' },
         ],
     },
     {
@@ -26,5 +26,10 @@ export const links = [
         title: 'Job Sheet Creation',
         icon: "/assets/images/menu/lead.png", 
         route: 'jobs',
+    },
+    {
+        title: 'Assign Driver',
+        icon: "/assets/images/menu/lead.png", 
+        route: 'assign-driver',
     }
 ];

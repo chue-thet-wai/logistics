@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/inertia-react';
 import { Link, Table, Modal, ButtonIcon } from '../../components';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
-const Index = ({ leads, pageTitle }) => {
+const Index = ({ leads, statuses=[], pageTitle }) => {
     const { props } = usePage();
     const userPermissions = props.auth?.permissions || [];
 
@@ -30,7 +30,14 @@ const Index = ({ leads, pageTitle }) => {
         { header: "ETA", field: "eta" },
         { header: "No. of Containers", field: "containers" },
         { header: "Free Days", field: "free_day" },
-        {header: "Status",field: "status_label"},
+        {
+            header: "Status",
+            field: 'status',
+            render: (row) => {
+                const status = statuses.find(s => s.value === row.status);
+                return status ? status.label : row.status;
+            },
+        },
     ], []);
 
     const handleDeleteClick = useCallback((id) => {

@@ -9,13 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Route extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $guarded = [];
 
-    protected $fillable = [
-        'name',
-        'city',
-        'state',
-        'country',
-        'zip_code',
-        'address',
-    ];
+    public function checkpoints()
+    {
+        return $this->hasMany(Checkpoint::class);
+    }
+
+
 }

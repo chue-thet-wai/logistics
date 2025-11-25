@@ -47,6 +47,11 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Edit Jobs', 'route' => 'jobs.edit'],
             ['name' => 'Delete Jobs', 'route' => 'jobs.destroy'],
 
+            ['name' => 'View Assign Driver', 'route' => 'assign-driver.index'],
+            ['name' => 'Create Assign Driver', 'route' => 'assign-driver.create'],
+            ['name' => 'Edit Assign Driver', 'route' => 'assign-driver.edit'],
+            ['name' => 'Delete Assign Driver', 'route' => 'assign-driver.destroy'],
+
         ];
 
         
@@ -66,6 +71,7 @@ class RolePermissionSeeder extends Seeder
             'View Routes', 'Create Routes', 'Edit Routes', 'Delete Routes',
             'View Leads', 'Create Leads', 'Edit Leads', 'Delete Leads',
             'View Jobs', 'Create Jobs', 'Edit Jobs', 'Delete Jobs',
+            'View Assign Driver', 'Create Assign Driver', 'Edit Assign Driver', 'Delete Assign Driver',
         ];
         $adminRole = Role::firstOrCreate(['name' => 'Admin']);
         $adminRole->syncPermissions($adminPermissions);

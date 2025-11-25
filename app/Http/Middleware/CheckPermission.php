@@ -19,6 +19,22 @@ class CheckPermission
         $routeName = $request->route()->getName();
         Log::info($routeName);
 
+         // Skip routes
+        $skipRoutes = [
+            'checkpoints.index',
+            'checkpoints.create',
+            'checkpoints.store',
+            'checkpoints.edit',
+            'checkpoints.update',
+            'checkpoints.destroy',
+        ];
+
+        if (in_array($routeName, $skipRoutes) || str_starts_with($routeName, 'checkpoints.')) {
+            return $next($request);
+        } else if ($routeName && str_starts_with($routeName, 'jobs.documents')) {
+             return $next($request);
+        }
+
         $permission = Permission::where('route', $routeName)->first();
 
         if (!$permission) {

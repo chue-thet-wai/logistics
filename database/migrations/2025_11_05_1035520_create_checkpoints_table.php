@@ -11,24 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leads', function (Blueprint $table) {
+        Schema::create('checkpoints', function (Blueprint $table) {
             $table->id();
-            $table->string('booking_id')->unique();
-            $table->string('cus_id');
-            $table->string('mode')->nullable(); 
-            $table->integer('containers')->default(0);
-            $table->date('eta')->nullable();
-            $table->string('category')->nullable();
-            $table->string('bl_number')->nullable();
-            $table->integer('free_day')->default(0);
-            $table->integer('status')->default(0); //0 is pending and 1 is confirm
+            $table->string('name');
+            $table->foreignId('route_id')->nullable()->constrained('routes')->onDelete('set null');
+            $table->string('type')->nullable();
+            $table->string('eta')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
+            $table->text('remark')->nullable();
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->unsignedBigInteger('updated_by')->nullable()->index();
 
-            $table->softDeletes();     
-            $table->timestamps();
+            $table->timestamps(); 
+            $table->softDeletes(); 
 
-            $table->foreign('cus_id')->references('cus_id')->on('customers')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
             $table->index('created_at');
@@ -41,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leads');
+        Schema::dropIfExists('checkpoints');
     }
 };

@@ -10,7 +10,6 @@ use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
-
     public function index()
     {
         $customers = Customer::with('user')
@@ -18,35 +17,66 @@ class CustomerController extends Controller
 
         return Inertia::render('Customers/Index', [
             'customers' => $customers,
+            'statuses' => config('common.statuses'),
+            'customer_types' => config('common.customer_types'),
             'pageTitle' => 'Customers',
         ]);
     }
 
-    
     public function create()
     {
         return Inertia::render('Customers/Form', [
+            'statuses' => config('common.statuses'),
+            'customer_types' => config('common.customer_types'),
             'pageTitle' => 'Create Customer',
         ]);
     }
 
-   
     public function store(Request $request)
     {
         $request->validate([
+            // Basic info
+            'cus_id' => 'nullable|string|max:50',
             'name' => 'required|string|max:255',
+            'customer_type' => 'integer',
+            'status' => 'integer',
+
+            // Contact details
+            'contact_person' => 'nullable|string|max:255',
+            'designation' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string|max:20',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'zip_code' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
+            'secondary_phone' => 'nullable|string|max:20',
+            'whatsapp' => 'nullable|string|max:20',
+
+            // Billing
+            'billing_address' => 'nullable|string|max:255',
+            'billing_country' => 'nullable|string|max:100',
+            'billing_state' => 'nullable|string|max:100',
+            'billing_city' => 'nullable|string|max:100',
+            'billing_zip' => 'nullable|string|max:20',
+
+            // Shipping
+            'shipping_address' => 'nullable|string|max:255',
+            'shipping_country' => 'nullable|string|max:100',
+            'shipping_state' => 'nullable|string|max:100',
+            'shipping_city' => 'nullable|string|max:100',
+            'shipping_zip' => 'nullable|string|max:20',
+
+            // Financial
+            'credit_limit' => 'nullable|numeric',
+            'currency' => 'nullable|string|max:10',
+            'payment_terms' => 'nullable|string|max:100',
+            'tax_id' => 'nullable|string|max:100',
+            'invoice_email' => 'nullable|email',
+
+            // Notes
+            'notes' => 'nullable|string',
         ]);
 
-       
+        // Create linked user account
         $user = User::create([
-            'name' => $request->name,
+            'name'  => $request->name,
             'email' => $request->email,
             'password' => Hash::make('customer'),
             'created_by' => auth()->id(),
@@ -54,25 +84,23 @@ class CustomerController extends Controller
 
         $user->assignRole('Customer');
 
+        // Generate CUS-ID
         $lastCustomer = Customer::orderBy('id', 'desc')->first();
         $nextId = $lastCustomer ? $lastCustomer->id + 1 : 1;
         $cus_id = 'CUS-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
 
-        Customer::create([
-            'user_id' => $user->id,
-            'cus_id' => $cus_id,
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'city' => $request->city,
-            'state' => $request->state,
-            'country' => $request->country,
-            'zip_code' => $request->zip_code,
-            'address' => $request->address,
-            'created_by' => auth()->id(),
-        ]);
+        // Create customer
+        Customer::create(array_merge(
+            $request->all(),
+            [
+                'user_id' => $user->id,
+                'cus_id' => $cus_id,
+                'created_by' => auth()->id(),
+            ]
+        ));
 
-        return redirect()->route('customers.index')->with('success', 'Customer created successfully!');
+        return redirect()->route('customers.index')
+            ->with('success', 'Customer created successfully!');
     }
 
     public function edit(Customer $customer)
@@ -81,6 +109,8 @@ class CustomerController extends Controller
 
         return Inertia::render('Customers/Form', [
             'customer' => $customer,
+            'statuses' => config('common.statuses'),
+            'customer_types' => config('common.customer_types'),
             'pageTitle' => 'Edit Customer',
         ]);
     }
@@ -88,47 +118,74 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
         $request->validate([
+            // Basic info
             'name' => 'required|string|max:255',
+            'customer_type' => 'integer',
+            'status' => 'integer',
+
+            // Contact
+            'contact_person' => 'nullable|string|max:255',
+            'designation' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email,' . $customer->user_id,
             'phone' => 'nullable|string|max:20',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'zip_code' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
+            'secondary_phone' => 'nullable|string|max:20',
+            'whatsapp' => 'nullable|string|max:20',
+
+            // Billing
+            'billing_address' => 'nullable|string|max:255',
+            'billing_country' => 'nullable|string|max:100',
+            'billing_state' => 'nullable|string|max:100',
+            'billing_city' => 'nullable|string|max:100',
+            'billing_zip' => 'nullable|string|max:20',
+
+            // Shipping
+            'shipping_address' => 'nullable|string|max:255',
+            'shipping_country' => 'nullable|string|max:100',
+            'shipping_state' => 'nullable|string|max:100',
+            'shipping_city' => 'nullable|string|max:100',
+            'shipping_zip' => 'nullable|string|max:20',
+
+            // Financial
+            'credit_limit' => 'nullable|numeric',
+            'currency' => 'nullable|string|max:10',
+            'payment_terms' => 'nullable|string|max:100',
+            'tax_id' => 'nullable|string|max:100',
+            'invoice_email' => 'nullable|email',
+
+            // Notes
+            'notes' => 'nullable|string',
         ]);
 
-        $user = $customer->user;
-        $user->update([
+        // Update linked user
+        $customer->user->update([
             'name' => $request->name,
             'email' => $request->email,
             'updated_by' => auth()->id(),
         ]);
 
-        $customer->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'city' => $request->city,
-            'state' => $request->state,
-            'country' => $request->country,
-            'zip_code' => $request->zip_code,
-            'address' => $request->address,
-            'updated_by' => auth()->id(),
-        ]);
+        // Update customer
+        $customer->update(array_merge(
+            $request->all(),
+            [
+                'updated_by' => auth()->id(),
+            ]
+        ));
 
-        return redirect()->route('customers.index')->with('success', 'Customer updated successfully!');
+        return redirect()->route('customers.index')
+            ->with('success', 'Customer updated successfully!');
     }
 
     public function destroy(Customer $customer)
     {
         $user = $customer->user;
+
         $customer->delete();
 
         if ($user) {
             $user->delete();
         }
 
-        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully!');
+        return redirect()->route('customers.index')
+            ->with('success', 'Customer deleted successfully!');
     }
 }

@@ -11,25 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('routes', function (Blueprint $table) {
-            $table->id(); 
-            $table->string('name');
-            $table->string('origin')->nullable();
-            $table->string('destination')->nullable();
-            $table->string('total_distance')->nullable();
-            $table->string('estimate_duration')->nullable();
-            $table->integer('status')->default(0);//0 is inactive and 1 is active
-            $table->text('remark')->nullable();
+        Schema::create('job_attachments', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('job_id');
+            $table->string('document_type');
+            $table->string('file_name');
+            $table->string('file_path');
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->unsignedBigInteger('updated_by')->nullable()->index();
+            $table->timestamps();
 
-            $table->timestamps(); 
-            $table->softDeletes(); 
-
+            $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
-            $table->index('created_at');
-            $table->index('updated_at');
         });
     }
 
@@ -38,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('routes');
+        Schema::dropIfExists('job_attachments');
     }
 };

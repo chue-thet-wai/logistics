@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LeadFile extends Model
 {
-    protected $fillable = [
-        'lead_id',
-        'file_path',
-        'file_type',
-    ];
+    protected $guarded = [];
 
     public function lead()
     {

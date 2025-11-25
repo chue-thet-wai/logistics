@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import { FormWrapper, Label, Input, Button, Select } from "../../components";
 
-const LeadForm = ({ lead = null, customers, categories, pageTitle  }) => {
+const LeadForm = ({ lead = null, customers, categories=[], pageTitle  }) => {
     const [formData, setFormData] = useState({
         booking_id : lead?.booking_id || "",
         cus_id: lead?.cus_id || "",
@@ -176,11 +176,8 @@ const LeadForm = ({ lead = null, customers, categories, pageTitle  }) => {
                                 id="category"
                                 name="category"
                                 value={formData.category}
-                                onChange={(value) => handleSelectChange("category", value)}
-                                options={categories.map((cat) => ({
-                                    value: cat.value,
-                                    label: cat.label,
-                                }))}
+                                onChange={handleChange}
+                                options={categories}
                                 placeholder="Select Category"
                                 error={errors.category}
                             />
@@ -231,7 +228,7 @@ const LeadForm = ({ lead = null, customers, categories, pageTitle  }) => {
                                     {lead.files.map((file, index) => (
                                         <li key={index}>
                                             <a
-                                                href={`/storage/${file.file_path}`}
+                                                href={`http://sgp1.digitaloceanspaces.com/assets-kidcares/${file.file_path}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-600 hover:underline"

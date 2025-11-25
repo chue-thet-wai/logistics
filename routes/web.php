@@ -5,9 +5,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\JobDocumentController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\CheckpointController;
+use App\Http\Controllers\AssignDriverController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -43,10 +46,23 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('customers', CustomerController::class);
         Route::resource('drivers', DriverController::class);
         Route::resource('routes', RouteController::class);
+
+        Route::prefix('routes/{route}')->group(function () {
+            Route::resource('checkpoints', CheckpointController::class);
+        });
+
         Route::resource('leads', LeadController::class);
         Route::post('leads/{id}/update', [LeadController::class, 'update'])->name('leads.update');
+
         Route::resource('jobs', JobController::class);
-       
+
+        Route::get('/jobs/{job}/documents', [JobDocumentController::class, 'index'])->name('jobs.documents.index');
+        Route::post('/jobs/{job}/documents', [JobDocumentController::class, 'store'])->name('jobs.documents.store');
+        Route::post('/jobs/{job}/documents/{attachment}/replace', [JobDocumentController::class, 'replace'])->name('jobs.documents.replace');
+
+        Route::resource('assign-driver', AssignDriverController::class)->parameters(['assign-driver' => 'job']);
+
+      
     });
     
 });

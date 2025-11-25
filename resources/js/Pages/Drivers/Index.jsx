@@ -20,7 +20,6 @@ const Index = ({ drivers, pageTitle }) => {
         { header: "Name", field: 'name' },
         { header: "Email", field: 'email' },
         { header: "Phone", field: 'phone' },
-        { header: "City", field: 'city' },
     ], []);
 
     const handleDeleteClick = useCallback((id) => {

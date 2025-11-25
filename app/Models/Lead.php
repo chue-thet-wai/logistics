@@ -8,28 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Lead extends Model
 {
     use SoftDeletes;
-
-    protected $fillable = [
-        'booking_id',
-        'cus_id',
-        'mode',
-        'containers',
-        'eta',
-        'category',
-        'bl_number',
-        'free_day',
-        'created_by',
-        'updated_by',
-    ];
-
-    protected $dates = [
-        'eta',
-        'free_day',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
-
+    protected $guarded = [];
+    
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'cus_id', 'cus_id');

@@ -5,7 +5,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { usePage } from '@inertiajs/inertia-react';
 import { usePermissions } from '../../utils/usePermissions';
 
-const RoutesIndex = ({ routes, pageTitle}) => {
+const RoutesIndex = ({ routes, statuses=[], pageTitle}) => {
     const { props } = usePage();
     const userPermissions = props.auth?.permissions || [];
 
@@ -30,13 +30,20 @@ const RoutesIndex = ({ routes, pageTitle}) => {
             });
         }
     }, [routeToDelete]);
-
+   
     const columns = React.useMemo(() => [
         { header: "Name", field: 'name' },
-        { header: "City", field: 'city' },
-        { header: "State", field: 'state' },
-        { header: "Country", field: 'country' },
-        { header: "Zip Code", field: 'zip_code' },
+        { header: "Total Distance", field: 'total_distance' },
+        { header: "Estimate Duration", field: 'estimate_duration' },
+        { header: "Checkpoints", field: 'checkpoints_count' },
+        {
+            header: "Status",
+            field: 'status',
+            render: (row) => {
+                const status = statuses.find(s => s.value === row.status);
+                return status ? status.label : row.status;
+            },
+        },
     ]);
 
     const RowActions = ({ rowId }) => (
