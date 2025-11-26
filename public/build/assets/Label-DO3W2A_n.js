@@ -1,0 +1,1 @@
+import{j as e}from"./app-DCRexY3F.js";const o=({htmlFor:t,children:s,className:a="",textSize:r="text-base",textColor:l="text-gray-900",margin:m="mb-1",required:x=!1})=>e.jsxs("label",{htmlFor:t,className:"block "+r+" font-medium dark:text-white mb-2 "+l+" "+m+" "+a,children:[s,x&&e.jsx("span",{className:"text-red-500 ml-1",children:"*"})]});export{o as L};
