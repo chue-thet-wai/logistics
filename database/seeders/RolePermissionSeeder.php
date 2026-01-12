@@ -32,10 +32,10 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Edit Drivers', 'route' => 'drivers.edit'],
             ['name' => 'Delete Drivers', 'route' => 'drivers.destroy'],
 
-            ['name' => 'View Routes', 'route' => 'routes.index'],
-            ['name' => 'Create Routes', 'route' => 'routes.create'],
-            ['name' => 'Edit Routes', 'route' => 'routes.edit'],
-            ['name' => 'Delete Routes', 'route' => 'routes.destroy'],
+            ['name' => 'View Routes', 'route' => 'transport-routes.index'],
+            ['name' => 'Create Routes', 'route' => 'transport-routes.create'],
+            ['name' => 'Edit Routes', 'route' => 'transport-routes.edit'],
+            ['name' => 'Delete Routes', 'route' => 'transport-routes.destroy'],
 
             ['name' => 'View Leads', 'route' => 'leads.index'],
             ['name' => 'Create Leads', 'route' => 'leads.create'],

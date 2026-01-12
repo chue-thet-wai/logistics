@@ -27,6 +27,11 @@
             ['label' => 'Pending', 'value' => 0],
             ['label' => 'Confirmed', 'value' => 1],
             ['label' => 'Assigned Driver', 'value' => 2],
+            ['label' => 'Arrived Port', 'value' => 3],
+            ['label' => 'Cargo Loaded', 'value' => 4],
+            ['label' => 'Left Port', 'value' => 5],
+            ['label' => 'On Route', 'value' => 6],
+            ['label' => 'Arrived', 'value' => 7],
         ],
         'paginate_per_page' => 10,
     ];

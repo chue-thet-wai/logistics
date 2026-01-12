@@ -29,9 +29,12 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            $userData = User::find($user->id); 
+            
+            if ($user->hasRole('Driver')) {
+                return redirect()->route('driver.dashboard');
+            }
 
-            return Redirect::route('dashboard');
+            return redirect()->route('dashboard');
         }
 
         return back()->withErrors([

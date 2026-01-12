@@ -8,6 +8,7 @@ use App\Models\Route;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class JobController extends Controller
 {
@@ -112,4 +113,14 @@ class JobController extends Controller
             'pageTitle' => 'Job Details',
         ]);
     }
+
+    public function destroy(Job $job)
+    {
+        $job->delete();
+
+        return redirect()
+            ->route('jobs.index')
+            ->with('success', 'Job deleted successfully.');
+    }
+
 }

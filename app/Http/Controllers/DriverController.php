@@ -38,6 +38,7 @@ class DriverController extends Controller
         $request->validate([
             'name'          => 'required|string|max:255',
             'email'         => 'required|email|unique:users,email',
+            'password'      => 'required|min:6|confirmed',
             'phone'         => 'nullable|string|max:20',
             'truck_number'  => 'nullable|string|max:100',
             'vehicle_type'  => 'nullable|string|max:100',
@@ -54,7 +55,7 @@ class DriverController extends Controller
         $user = User::create([
             'name'       => $request->name,
             'email'      => $request->email,
-            'password'   => Hash::make('driver'),
+            'password'   => Hash::make($request->password),
             'created_by' => auth()->id(),
         ]);
         $user->assignRole('Driver');
@@ -94,6 +95,7 @@ class DriverController extends Controller
         $request->validate([
             'name'          => 'required|string|max:255',
             'email'         => 'required|email|unique:users,email,' . $driver->user_id,
+            'password'      => 'nullable|min:6|confirmed',
             'phone'         => 'nullable|string|max:20',
             'truck_number'  => 'nullable|string|max:100',
             'vehicle_type'  => 'nullable|string|max:100',
@@ -103,11 +105,17 @@ class DriverController extends Controller
             'remark'        => 'nullable|string',
         ]);
 
-        $driver->user->update([
+        $data = [
             'name'       => $request->name,
             'email'      => $request->email,
             'updated_by' => auth()->id(),
-        ]);
+        ];
+
+        if ($request->password) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $driver->user->update($data);
 
         $driver->update([
             'name'          => $request->name,

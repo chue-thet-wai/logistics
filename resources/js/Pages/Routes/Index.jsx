@@ -22,7 +22,7 @@ const RoutesIndex = ({ routes, statuses=[], pageTitle}) => {
 
     const handleDelete = useCallback(() => {
         if (routeToDelete) {
-            Inertia.delete(`/routes/${routeToDelete}`, {
+            Inertia.delete(`/transport-routes/${routeToDelete}`, {
                 onSuccess: () => {
                     setModalOpen(false);
                     setRouteToDelete(null);
@@ -49,7 +49,7 @@ const RoutesIndex = ({ routes, statuses=[], pageTitle}) => {
     const RowActions = ({ rowId }) => (
         <div className="flex items-center space-x-2">
             <ButtonIcon
-                href={`/routes/${rowId}/edit`}
+                href={`/transport-routes/${rowId}/edit`}
                 icon={<FaEdit />}
                 iconColor="text-gray-500"
                 hoverColor="hover:text-gray-700"
@@ -78,7 +78,7 @@ const RoutesIndex = ({ routes, statuses=[], pageTitle}) => {
                     {pageTitle}
                 </h1>
                 {canCreate && (
-                    <Link href="/routes/create">+ New Route</Link>
+                    <Link href="/transport-routes/create">+ New Route</Link>
                 )}
             </div>
 
@@ -87,7 +87,7 @@ const RoutesIndex = ({ routes, statuses=[], pageTitle}) => {
                     columns={columns}
                     tableData={routes}
                     onPageChange={(page) => {
-                        Inertia.get(`/routes?page=${page}`, { preserveState: true });
+                        Inertia.get(`/transport-routes?page=${page}`, { preserveState: true });
                     }}
                     actions={(row) => <RowActions rowId={row.id} />}
                 />

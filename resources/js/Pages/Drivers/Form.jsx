@@ -157,6 +157,35 @@ const DriverForm = ({ driver = null, routes = [], checkpoints = [], statuses =[]
                             />
                         </div>
 
+                        {/* Password */}
+                        <div>
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                name="password"
+                                type="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                error={errors.password}
+                                required={!driver} 
+                            />
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div>
+                            <Label htmlFor="password_confirmation">Confirm Password</Label>
+                            <Input
+                                id="password_confirmation"
+                                name="password_confirmation"
+                                type="password"
+                                value={formData.password_confirmation}
+                                onChange={handleChange}
+                                error={errors.password_confirmation}
+                                required={!driver}
+                            />
+                        </div>
+
+
                         {/* Remark */}
                         <div className="col-span-2">
                             <Label htmlFor="remark">Remark</Label>

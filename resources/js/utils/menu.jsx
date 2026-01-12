@@ -13,7 +13,7 @@ export const links = [
             { name: 'Roles',  route: 'roles', permission: 'View Roles' },
             { name: 'Users',  route: 'users', permission: 'View Users' },
             { name: 'Customers',  route: 'customers', permission: 'View Customers' },
-            { name: 'Routes',  route: 'routes', permission: 'View Routes' },
+            { name: 'Routes',  route: 'transport-routes', permission: 'View Routes' },
             { name: 'Drivers', route: 'drivers', permission: 'View Drivers' },
         ],
     },

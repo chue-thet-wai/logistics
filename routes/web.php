@@ -13,6 +13,10 @@ use App\Http\Controllers\CheckpointController;
 use App\Http\Controllers\AssignDriverController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Driver\DriverDashboardController;
+use App\Http\Controllers\Driver\DriverJobController;
+use App\Http\Controllers\Driver\DriverSettingController;
+use App\Http\Controllers\Driver\DriverNotificationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia; 
 
@@ -45,11 +49,13 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('customers', CustomerController::class);
         Route::resource('drivers', DriverController::class);
-        Route::resource('routes', RouteController::class);
+        Route::resource('transport-routes', RouteController::class)
+            ->parameters(['transport-routes' => 'routeModel']);
 
-        Route::prefix('routes/{route}')->group(function () {
+        Route::prefix('transport-routes/{route}')->group(function () {
             Route::resource('checkpoints', CheckpointController::class);
         });
+
 
         Route::resource('leads', LeadController::class);
         Route::post('leads/{id}/update', [LeadController::class, 'update'])->name('leads.update');
@@ -64,6 +70,29 @@ Route::middleware(['auth'])->group(function () {
 
       
     });
+
+    Route::prefix('driver')->group(function () {
+        Route::get('/dashboard', [DriverDashboardController::class, 'dashboard'])->name('driver.dashboard');
+
+        Route::get('/jobs', [DriverJobController::class, 'index'])->name('driver.jobs');
+        Route::get('/jobs/{id}', [DriverJobController::class, 'show']);
+        Route::get('/jobs/{job}/update', [DriverJobController::class, 'editStatus']);
+        Route::post('/jobs/{job}/update', [DriverJobController::class, 'updateStatus']);
+
+        Route::get('/notifications', [DriverNotificationController::class, 'index'])->name('driver.notifications');
+
+        Route::post('/notifications/read/{id}', [DriverNotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [DriverNotificationController::class, 'markAllAsRead']);
+
+        Route::delete('/notifications/{id}', [DriverNotificationController::class, 'destroy']);
+        Route::delete('/notifications', [DriverNotificationController::class, 'destroyAll']);
+
+        Route::get('/settings', [DriverSettingController::class, 'index'])->name('driver.settings');
+        Route::get('/settings/edit', [DriverSettingController::class, 'edit'])->name('driver.settings.edit');
+        Route::put('/settings', [DriverSettingController::class, 'update'])->name('driver.settings.update');
+
+    });
+
     
 });
 

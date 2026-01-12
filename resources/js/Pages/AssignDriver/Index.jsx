@@ -52,7 +52,7 @@ const AssignDriverIndex = ({ jobs, statuses=[], categories=[], pageTitle }) => {
 
     const handleDelete = useCallback(() => {
         if (jobToDelete) {
-            Inertia.delete(`/jobs/${jobToDelete}`, {
+            Inertia.delete(`/assign-driver/${jobToDelete}`, {
                 onSuccess: () => {
                     setModalOpen(false);
                     setJobToDelete(null);
@@ -118,7 +118,7 @@ const AssignDriverIndex = ({ jobs, statuses=[], categories=[], pageTitle }) => {
                     columns={columns}
                     tableData={jobs}
                     onPageChange={(page) =>
-                        Inertia.get(`/jobs?page=${page}`, { preserveState: true })
+                        Inertia.get(`/assign-driver?page=${page}`, { preserveState: true })
                     }
                     actions={(row) => <RowActions rowId={row.id} />}
                 />

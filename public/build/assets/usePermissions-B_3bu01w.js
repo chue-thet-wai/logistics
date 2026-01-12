@@ -1,1 +1,0 @@
-import"./app-DCRexY3F.js";function i(t=[]){const s=e=>t.includes(e);return{checkMenuPermissions:e=>({canCreate:s(`Create ${e}`),canEdit:s(`Edit ${e}`),canDelete:s(`Delete ${e}`),canExport:s(`Export ${e}`)})}}export{i as u};

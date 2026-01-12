@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\JobDriver;
+use Illuminate\Support\Facades\Log;
 
 class AssignDriverController extends Controller
 {
@@ -46,6 +47,7 @@ class AssignDriverController extends Controller
    
     public function update(Request $request, Job $job)
     {
+        Log::info($job);
         $validated = $request->validate([
             'driver_id' => 'required|exists:drivers,id',
         ]);
@@ -89,11 +91,34 @@ class AssignDriverController extends Controller
 
     public function show(Job $job)
     {
-        $job->load(['lead.customer', 'driverAssignment.driver.user']);
+        $job->load(['lead.customer', 'driverAssignments.driver.user']);
 
         return Inertia::render('AssignDriver/Show', [
             'job'       => $job,
             'pageTitle' => 'Assigned Job Details',
         ]);
     }
+
+    public function destroy(Job $job)
+    {
+        $assignment = JobDriver::where('job_id', $job->id)->first();
+
+        if ($assignment) {
+            Driver::where('id', $assignment->driver_id)->update([
+                'available' => 1
+            ]);
+
+            $assignment->delete();
+        }
+
+        $job->update([
+            'status' => 1, 
+            'updated_by' => auth()->id(),
+        ]);
+
+        return redirect()
+            ->route('assign-driver.index')
+            ->with('success', 'Driver assignment removed successfully.');
+    }
+
 }

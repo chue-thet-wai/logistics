@@ -27,7 +27,7 @@ const CheckpointForm = ({ checkpoint = null, route = null, checkpoint_types=null
         setErrors({});
 
         const method = checkpoint ? "put" : "post";
-        const url = checkpoint ? `/routes/${route.id}/checkpoints/${checkpoint.id}` : `/routes/${route.id}/checkpoints`;
+        const url = checkpoint ? `/transport-routes/${route.id}/checkpoints/${checkpoint.id}` : `/transport-routes/${route.id}/checkpoints`;
 
         Inertia[method](url, formData, {
             onError: (err) => {
@@ -36,7 +36,7 @@ const CheckpointForm = ({ checkpoint = null, route = null, checkpoint_types=null
             },
             onSuccess: () => {
                 setProcessing(false);
-                Inertia.visit(`/routes/${formData.route_id}/checkpoints`);
+                Inertia.visit(`/transport-routes/${formData.route_id}/checkpoints`);
             }
         });
     };
@@ -131,7 +131,7 @@ const CheckpointForm = ({ checkpoint = null, route = null, checkpoint_types=null
                     {/* Buttons */}
                     <div className="flex justify-end space-x-3 mt-4">
                         <Button
-                            onClick={() => Inertia.visit(`/routes/${formData.route_id}/checkpoints`)}
+                            onClick={() => Inertia.visit(`/transport-routes/${formData.route_id}/checkpoints`)}
                             variant="secondary"
                             disabled={processing}
                         >

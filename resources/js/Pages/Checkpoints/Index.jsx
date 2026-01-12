@@ -14,7 +14,7 @@ const CheckpointIndex = ({ route, checkpoints, checkpoint_types, pageTitle }) =>
 
     const handleDelete = () => {
         if (deleteId) {
-            Inertia.delete(`/routes/${route.id}/checkpoints/${deleteId}`, {
+            Inertia.delete(`/transport-routes/${route.id}/checkpoints/${deleteId}`, {
                 onSuccess: () => {
                     setModalOpen(false);
                     setDeleteId(null);
@@ -42,7 +42,7 @@ const CheckpointIndex = ({ route, checkpoints, checkpoint_types, pageTitle }) =>
         <div className="flex items-center space-x-2">
 
             <ButtonIcon
-                href={`/routes/${route.id}/checkpoints/${rowId}/edit`}
+                href={`/transport-routes/${route.id}/checkpoints/${rowId}/edit`}
                 icon={<FaEdit />}
                 tooltip="Edit"
                 variant="icon"
@@ -68,10 +68,10 @@ const CheckpointIndex = ({ route, checkpoints, checkpoint_types, pageTitle }) =>
             <div className="flex justify-between items-center h-14 px-6 py-2 border-b border-gray-200">
                 <h1 className="text-lg font-semibold">{pageTitle}</h1>
                 <div>
-                    <Link href={`/routes/${route.id}/edit`} className="mx-4">
+                    <Link href={`/transport-routes/${route.id}/edit`} className="mx-4">
                         Rotue Detail
                     </Link>
-                    <Link href={`/routes/${route.id}/checkpoints/create`}>
+                    <Link href={`/transport-routes/${route.id}/checkpoints/create`}>
                         + Add Checkpoint
                     </Link>
                 </div>

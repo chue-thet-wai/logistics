@@ -42,7 +42,7 @@ const Dashboard = ({ stats }) => {
           <StatCard
             icon={<FaShippingFast size={16} />}
             label="Active"
-            value={stats.activeCount || 38}
+            value={stats.activeCount || 0}
             color="blue"
           />
         </Link>
@@ -51,7 +51,7 @@ const Dashboard = ({ stats }) => {
           <StatCard
             icon={<FaCheckCircle size={16} />}
             label="Completed"
-            value={stats.completedCount || 38}
+            value={stats.completedCount || 0}
             color="green"
           />
         </Link>
@@ -60,7 +60,7 @@ const Dashboard = ({ stats }) => {
           <StatCard
             icon={<FaExclamationTriangle size={16} />}
             label="Delays"
-            value={stats.delayCount || 6}
+            value={stats.delayCount || 0}
             color="orange"
           />
         </Link>
@@ -69,8 +69,8 @@ const Dashboard = ({ stats }) => {
           <StatCard
             icon={<FaUserTie size={16} />}
             label="Drivers On"
-            value={stats.driversOn || 14}
-            subValue={stats.totalDrivers || 20}
+            value={stats.driversOn || 0}
+            subValue={stats.totalDrivers || 0}
             color="gray"
           />
         </Link>

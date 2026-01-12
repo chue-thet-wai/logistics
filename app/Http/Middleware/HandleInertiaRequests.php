@@ -37,18 +37,15 @@ class HandleInertiaRequests extends Middleware
     {
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
+                'user' => $request->user()
+                ? [
+                    'id'    => $request->user()->id,
+                    'name'  => $request->user()->name,
                     'email' => $request->user()->email,
+                    'role'   => $request->user()->getRoleNames()->first() ?? 'user',
                     'avatar' => $request->user()->avatar ?? asset('assets/images/profile.jpg'),
-                    'agent' => $request->user()->agent ?? [
-                        'biz_name' => '',
-                        'phone' => '',
-                        'address' => '',
-                        'location' => '',
-                    ],
-                ] : null,
+                ]
+                : null,
                 'permissions' => $request->user()
                     ? $request->user()->getAllPermissions()->pluck('name')->toArray()
                 : [],

@@ -85,7 +85,7 @@ class LeadController extends Controller
                 $shipment_id = 'SHP-' . time();
                 Job::create([
                     'booking_id' => $lead->booking_id,
-                    'shipment_id' => $lead->shipment_id,
+                    'shipment_id' => $shipment_id,
                     'cus_id' => $lead->cus_id,
                     'mode' => $lead->mode,
                     'category' => $lead->category,

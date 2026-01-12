@@ -17,8 +17,14 @@ class Driver extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function jobAssignment()
+    public function jobAssignments()
     {
-        return $this->hasOne(JobDriver::class);
+        return $this->hasMany(JobDriver::class);
+    }
+
+    public function jobs()
+    {
+        return $this->belongsToMany(Job::class, 'job_drivers')
+                    ->withTimestamps();
     }
 }

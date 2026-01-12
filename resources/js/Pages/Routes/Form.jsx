@@ -27,7 +27,7 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
         setErrors({});
 
         const method = route ? "put" : "post";
-        const url = route ? `/routes/${route.id}` : "/routes";
+        const url = route ? `/transport-routes/${route.id}` : "/transport-routes";
 
         Inertia[method](url, formData, {
             onError: (err) => {
@@ -36,7 +36,7 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
             },
             onSuccess: () => {
                 setProcessing(false);
-                Inertia.visit("/routes");
+                Inertia.visit("/transport-routes");
             }
         });
     };
@@ -47,7 +47,7 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
             <div className="flex justify-between items-center h-14 px-6 py-2 border-b border-gray-200">
                 <h1 className="text-lg font-semibold text-gray-800">{pageTitle}</h1>
                 {route && (
-                    <Link href={`/routes/${route.id}/checkpoints`}>
+                    <Link href={`/transport-routes/${route.id}/checkpoints`}>
                         Checkpoints
                     </Link>
                 )}
@@ -149,7 +149,7 @@ const RouteForm = ({ route = null, statuses=[], pageTitle }) => {
                     {/* Buttons */}
                     <div className="flex justify-end space-x-3 mt-4">
                         <Button
-                            onClick={() => Inertia.visit("/routes")}
+                            onClick={() => Inertia.visit("/transport-routes")}
                             variant="secondary"
                             disabled={processing}
                         >

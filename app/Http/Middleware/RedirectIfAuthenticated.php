@@ -15,6 +15,10 @@ class RedirectIfAuthenticated
         if (Auth::check()) {
             $user = Auth::user();
 
+            if ($user->hasRole('Driver')) {
+                return redirect()->route('driver.dashboard');
+            }
+
             return redirect('/dashboard'); 
         }
 

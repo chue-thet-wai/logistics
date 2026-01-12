@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class RouteController extends Controller
@@ -44,19 +45,21 @@ class RouteController extends Controller
 
         Route::create($validated);
 
-        return redirect()->route('routes.index')->with('success', 'Route created successfully!');
+        return redirect()->route('transport-routes.index')->with('success', 'Route created successfully!');
     }
 
-    public function edit(Route $route)
+    public function edit(Route $routeModel)
     {
+        Log::info('routemodal');
+        Log::info($routeModel);
         return Inertia::render('Routes/Form', [
-            'route' => $route,
+            'route' => $routeModel,
             'statuses' => config('common.statuses'),
             'pageTitle' => 'Edit Route',
         ]);
     }
 
-    public function update(Request $request, Route $route)
+    public function update(Request $request, Route $routeModel)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -70,15 +73,16 @@ class RouteController extends Controller
 
         $validated['updated_by'] = auth()->id();
 
-        $route->update($validated);
+        $routeModel->update($validated);
 
-        return redirect()->route('routes.index')->with('success', 'Route updated successfully!');
+        return redirect()->route('transport-routes.index')->with('success', 'Route updated successfully!');
     }
 
-    public function destroy(Route $route)
+    public function destroy(Route $routeModel)
     {
-        $route->delete();
+        $routeModel->delete();
 
-        return redirect()->route('routes.index')->with('success', 'Route deleted successfully!');
+        return redirect()->route('transport-routes.index')->with('success', 'Route deleted successfully!');
     }
+
 }

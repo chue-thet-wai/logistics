@@ -17,6 +17,9 @@ const Input = ({
   error = '',
   disabled = false,
   multiple = false, 
+  min = '0',
+  max,
+  step = '1',
 }) => {
 
   const inputClass =
@@ -44,6 +47,9 @@ const Input = ({
         className={inputClass}
         disabled={disabled}
         multiple={type === 'file' ? multiple : undefined} 
+        min={min}
+        max={max}
+        step={step}
       />
       {error && <p className="text-sm text-red-500">{error}</p>}
     </div>

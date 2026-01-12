@@ -6,12 +6,12 @@ const LeadForm = ({ lead = null, customers, categories=[], pageTitle  }) => {
     const [formData, setFormData] = useState({
         booking_id : lead?.booking_id || "",
         cus_id: lead?.cus_id || "",
-        mode: lead?.mode || "",
-        containers: lead?.containers || "",
+        mode: lead?.mode || "air",
+        containers: lead?.containers || "0",
         eta: lead?.eta || "",
         category: lead?.category || "",
         bl_number: lead?.bl_number || "",
-        free_day: lead?.free_day || "",
+        free_day: lead?.free_day || "0",
         files: [],
         submitType: "",
     });
@@ -163,6 +163,7 @@ const LeadForm = ({ lead = null, customers, categories=[], pageTitle  }) => {
                                 id="containers"
                                 name="containers"
                                 value={formData.containers}
+                                min={0}
                                 onChange={handleChange}
                                 error={errors.containers}
                             />
@@ -203,6 +204,7 @@ const LeadForm = ({ lead = null, customers, categories=[], pageTitle  }) => {
                                 type="number"
                                 value={formData.free_day}
                                 onChange={handleChange}
+                                min={0}  
                                 placeholder="Enter Free Day"
                                 error={errors.free_day}
                             />
