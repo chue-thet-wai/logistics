@@ -26,10 +26,15 @@ class JobDocumentController extends Controller
     {
         $request->validate([
             'document_type' => 'required|string',
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png,xls,xlsx,csv,txt|max:10240',
         ]);
 
-        $filename = time() . '_' . $request->file->getClientOriginalName();
+        //$filename = time() . '_' . $request->file->getClientOriginalName();
+        $filename = pathinfo(
+                            $request->file->getClientOriginalName(),
+                            PATHINFO_FILENAME
+                        ) . '_' . $job->booking_id . '_' . time()
+                          . '.' . $request->file->getClientOriginalExtension();
 
         $path = $request->file->storeAs("logistics/job_documents", $filename, 's3');
 
@@ -41,7 +46,7 @@ class JobDocumentController extends Controller
             'created_by'    => auth()->id(),
         ]);
 
-        return redirect()->route('jobs.documents.index', $job->id)
+        return redirect()->route('jobs.documents.index', $job->shipment_id)
             ->with('success', 'File replaced successfully.');
 
     }
@@ -50,7 +55,7 @@ class JobDocumentController extends Controller
     public function replace(Request $request, Job $job, JobAttachment $attachment)
     {
         $request->validate([
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png,xls,xlsx,csv,txt|max:10240',
         ]);
 
         $filename = time() . '_' . $request->file->getClientOriginalName();
@@ -64,7 +69,7 @@ class JobDocumentController extends Controller
             'updated_by' => auth()->id(),
         ]);
 
-        return redirect()->route('jobs.documents.index', $job->id)
+        return redirect()->route('jobs.documents.index', $job->shipment_id)
             ->with('success', 'File replaced successfully.');
 
     }

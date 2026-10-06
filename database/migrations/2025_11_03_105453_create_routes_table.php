@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('routes', function (Blueprint $table) {
             $table->id(); 
-            $table->string('name');
-            $table->string('origin')->nullable();
-            $table->string('destination')->nullable();
-            $table->string('total_distance')->nullable();
-            $table->string('estimate_duration')->nullable();
-            $table->integer('status')->default(0);//0 is inactive and 1 is active
+            $table->string('route_id')->unique(); 
+            $table->string('name')->index();
+            $table->string('origin')->nullable()->index();
+            $table->string('destination')->nullable()->index();
+            $table->string('total_distance')->nullable()->index();
+            $table->string('estimate_duration')->nullable()->index();
+            $table->integer('status')->default(0)->index();//0 is inactive and 1 is active
             $table->text('remark')->nullable();
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->unsignedBigInteger('updated_by')->nullable()->index();

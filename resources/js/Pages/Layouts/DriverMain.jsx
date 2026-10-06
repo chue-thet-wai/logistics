@@ -24,7 +24,7 @@ export default function DriverMain({ children }) {
                     url={currentUrl}
                 />
                 <NavItem
-                    href="/driver/jobs"
+                    href="/driver/trips"
                     icon={<FaBoxOpen size={22} />}
                     url={currentUrl}
                 />

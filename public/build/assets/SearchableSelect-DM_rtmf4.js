@@ -1,0 +1,7 @@
+import{r as s,j as r}from"./app-DdNz8GoR.js";const j=({name:o,value:i="",onChange:f,options:a=[],placeholder:x="Search...",className:p="",disabled:v=!1,error:m=""})=>{const[g,l]=s.useState(!1),[c,n]=s.useState(""),u=s.useRef(null),d=!!m;s.useEffect(()=>{const e=a.find(t=>t.value==i);n(e?e.label:"")},[i,a]);const h=c.trim()===""?a:a.filter(e=>e.label.toLowerCase().includes(c.toLowerCase()));s.useEffect(()=>{const e=t=>{u.current&&!u.current.contains(t.target)&&l(!1)};return document.addEventListener("mousedown",e),()=>document.removeEventListener("mousedown",e)},[]);const b=e=>{n(e.label),f({target:{name:o,value:e.value}}),l(!1)},w=e=>{const t=e.target.value;n(t),l(!0),t.trim()===""&&f({target:{name:o,value:""}})};return r.jsxs("div",{className:"w-full relative",ref:u,children:[r.jsx("input",{type:"text",name:o,value:c,onChange:w,onFocus:()=>l(!0),placeholder:x,disabled:v,className:`
+          w-full px-4 py-2 border rounded-md shadow-sm
+          ${d?"border-red-500":"border-gray-300"}
+          focus:outline-none focus:ring-2
+          ${d?"focus:ring-red-500":"focus:ring-primary-theme-color"}
+          ${p}
+        `}),g&&r.jsx("div",{className:"absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto",children:h.length>0?h.map(e=>r.jsx("div",{onClick:()=>b(e),className:"px-4 py-2 hover:bg-gray-100 cursor-pointer",children:e.label},e.value)):r.jsx("div",{className:"px-4 py-2 text-gray-400",children:"No results found"})}),d&&r.jsx("p",{className:"mt-1 text-sm text-red-600",children:m})]})};export{j as S};

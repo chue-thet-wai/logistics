@@ -15,6 +15,7 @@ export const links = [
             { name: 'Customers',  route: 'customers', permission: 'View Customers' },
             { name: 'Routes',  route: 'transport-routes', permission: 'View Routes' },
             { name: 'Drivers', route: 'drivers', permission: 'View Drivers' },
+            { name: 'Truck', route: 'trucks', permission: 'View Trucks' },
         ],
     },
     {
@@ -28,8 +29,33 @@ export const links = [
         route: 'jobs',
     },
     {
-        title: 'Assign Driver',
+        title: 'Truck Assign',
         icon: "/assets/images/menu/lead.png", 
-        route: 'assign-driver',
+        route: 'trips',
+    },
+    {
+        title: 'Charges',
+        icon: "/assets/images/menu/charges.png", 
+        route: 'charges',
+    },
+    {
+        title: 'Logs / Activity',
+        icon: "/assets/images/menu/log.png", 
+        route: 'activity-log',
+    },
+    {
+        title: 'Trip Progress',
+        icon: "/assets/images/menu/tripprogress.png", 
+        route: 'trip-progress',
+    },
+    {
+        title: 'POD & Document Upload',
+        icon: "/assets/images/menu/podupload.png", 
+        route: 'pod-upload',
+    },
+    {
+        title: 'Incoming Shipment Tracking',
+        icon: "/assets/images/menu/incoming-shipment-tracking.png", 
+        route: 'incoming-shipment-tracking',
     }
 ];

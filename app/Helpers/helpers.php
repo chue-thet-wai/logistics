@@ -8,6 +8,10 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use App\Models\ContainerIncomeSummary;
+use App\Models\ContainerExpenseSummary;
+use App\Models\ContainerTransportSummary;
 
 function checkUserRole($roleName, $user = null)
 {
@@ -19,80 +23,123 @@ function checkUserRole($roleName, $user = null)
     return $user->roles()->where('id', $roleId)->exists();
 }
 
-function generateCustomerID() 
-{
-    $characters = '1234567890';
-    $length = 9;
+if (!function_exists('generateUniqueId')) {
 
-    do {
-        $randomNumber = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomNumber .= $characters[rand(0, strlen($characters) - 1)];
+    /*function generateUniqueId($table, $column, $prefix = 'A-', $length = 6)
+    {
+        do {
+            $randomNumber = '';
+
+            for ($i = 0; $i < $length; $i++) {
+                $randomNumber .= rand(0, 9);
+            }
+
+            $id = $prefix . $randomNumber;
+
+            $exists = DB::table($table)->where($column, $id)->exists();
+
+        } while ($exists);
+
+        return $id;
+    }*/
+
+    function generateUniqueId($table, $column)
+    {
+        // Prefix + starting number config
+        $config = [
+            'leads' => ['prefix' => 'BKG-', 'start' => 1000000001],
+            'jobs' => ['prefix' => 'JID-', 'start' => 2000000001],
+            'trips' => ['prefix' => 'TRP-', 'start' => 3000000001],
+            'containers' => ['prefix' => 'CTN-', 'start' => 2000000001],
+            'customers' => ['prefix' => 'CUS-', 'start' => 1],
+            'drivers' => ['prefix' => 'DRV-', 'start' => 1],
+            'routes' => ['prefix' => 'RT-', 'start' => 1],
+            'checkpoints' => ['prefix' => 'CP-', 'start' => 1],
+            'trucks' => ['prefix' => 'TUK-', 'start' => 1],
+        ];
+
+        if (!isset($config[$table])) {
+            throw new \Exception("Table not configured for ID generation");
         }
 
-        $customerID = 'C-' . $randomNumber;
-        $exists = Customer::where('customer_id', $customerID)->exists();
+        $prefix = $config[$table]['prefix'];
+        $start  = $config[$table]['start'];
 
-    } while ($exists);
+        // Get last record
+        $last = DB::table($table)
+            ->where($column, 'like', $prefix . '%')
+            ->orderByDesc($column)
+            ->value($column);
 
-    return $customerID;
-}
-
-function generateAgentID() 
-{
-    $characters = '1234567890';
-    $length = 6;
-
-    do {
-        $randomNumber = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomNumber .= $characters[rand(0, strlen($characters) - 1)];
+        if ($last) {
+            // Extract number part
+            $number = (int) str_replace($prefix, '', $last);
+            $nextNumber = $number + 1;
+        } else {
+            $nextNumber = $start;
         }
 
-        $agentID = 'A-' . $randomNumber;
-        $exists = Agent::where('agent_id', $agentID)->exists();
+        // Format (for small IDs like CUS-0001)
+        if ($start === 1) {
+            return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        }
 
-    } while ($exists);
-
-    return $agentID;
-}
-
-function generateBitlyUrl($longUrl)
-{
-    //$bitlyToken = env('BITLY_TOKEN');  
-    $bitlyToken="a546e1a83b4d845d5f9e5f357a93fab8f19b4dad";
-
-    $response = Http::withHeaders([
-        'Authorization' => 'Bearer ' . $bitlyToken,
-        'Content-Type' => 'application/json',
-    ])->post('https://api-ssl.bitly.com/v4/shorten', [
-        'long_url' => $longUrl,
-        'domain' => 'bit.ly',
-    ]);
-
-    if ($response->successful()) {
-        return $response->json()['link'];  
-    } else {
-        Log::error('Bitly shortening failed: ' . $response->body());
-        return null;
-    }
-}
-
-function generateShortUrl(string $originalUrl): string
-{
-    $existing = ShortUrl::where('original_url', $originalUrl)->first();
-    if ($existing) {
-        return url($existing->code);
+        return $prefix . $nextNumber;
     }
 
-    do {
-        $code = Str::random(6);
-    } while (ShortUrl::where('code', $code)->exists());
 
-    $shortUrl = ShortUrl::create([
-        'code' => $code,
-        'original_url' => $originalUrl,
-    ]);
 
-    return url($code);
+    if (!function_exists('recalculate_container_summary')) {
+
+        function recalculate_container_summary($trip, $type, $container_id = null)
+        {
+            $trip->loadMissing(['containers', 'incomes', 'expenses', 'costs']);
+
+            if ($type === 'income' && $container_id) {
+
+                $total = $trip->incomes
+                    ->where('container_id', $container_id)
+                    ->sum('amount');
+
+                ContainerIncomeSummary::updateOrCreate(
+                    ['container_id' => $container_id],
+                    ['total' => $total]
+                );
+            }
+
+            if ($type === 'expense' && $container_id) {
+
+                $total = $trip->expenses
+                    ->where('container_id', $container_id)
+                    ->sum('amount');
+
+                ContainerExpenseSummary::updateOrCreate(
+                    ['container_id' => $container_id],
+                    ['total' => $total]
+                );
+            }
+
+            if ($type === 'cost') {
+
+                $containers = $trip->containers;
+
+                if ($containers->isEmpty()) return;
+
+                $containerCount = $containers->count();
+                $totalCost = $trip->costs->sum('amount');
+
+                $perContainerCost = $containerCount > 0
+                    ? $totalCost / $containerCount
+                    : 0;
+
+                foreach ($containers as $container) {
+
+                    ContainerTransportSummary::updateOrCreate(
+                        ['container_id' => $container->container_id],
+                        ['total' => $perContainerCost]
+                    );
+                }
+            }
+        }
+    }
 }

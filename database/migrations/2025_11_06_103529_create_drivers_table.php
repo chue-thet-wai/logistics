@@ -15,15 +15,13 @@ return new class extends Migration
             $table->id(); 
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('driver_id')->unique(); 
-            $table->string('name')->nullable();
+            $table->string('name')->nullable()->index();
             $table->string('email')->unique()->nullable();
-            $table->string('phone')->nullable();
-            $table->string('truck_number')->nullable();
-            $table->string('vehicle_type')->nullable();
-            $table->string('status')->nullable();
-            $table->string('route')->nullable();
-            $table->string('checkpoint')->nullable();
-            $table->boolean('available')->default(1);// 1 = Available, 0 = Busy
+            $table->string('phone',20)->nullable()->index();
+            $table->string('status',20)->nullable()->index();
+            $table->string('route')->nullable()->index();
+            $table->string('checkpoint')->nullable()->index();
+            $table->boolean('available')->default(1)->index();// 1 = Available, 0 = Busy
             $table->text('remark')->nullable();
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->unsignedBigInteger('updated_by')->nullable()->index();

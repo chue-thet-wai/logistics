@@ -9,6 +9,11 @@ class Lead extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
+
+    public function getRouteKeyName()
+    {
+        return 'booking_id';
+    }
     
     public function customer()
     {
@@ -25,8 +30,8 @@ class Lead extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function files()
+    public function job()
     {
-        return $this->hasMany(LeadFile::class, 'lead_id');
+        return $this->hasOne(Job::class, 'booking_id', 'booking_id');
     }
 }

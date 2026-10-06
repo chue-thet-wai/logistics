@@ -1,27 +1,51 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import { Table, ButtonIcon, Button , Link, Label } from "../../components";
 import { FaEye, FaUpload } from "react-icons/fa";
 
 const DocumentUpload = ({ job, attachments , pageTitle }) => {
     const [file, setFile] = useState(null);
-    const [documentType, setDocumentType] = useState("");
+    const [documentType, setDocumentType] = useState("Bill of Lading");
+    const fileRef = useRef(null);
 
     const handleUpload = (e) => {
         e.preventDefault();
+
+        if (!file) {
+            alert("Please select file");
+            return;
+        }
 
         const formData = new FormData();
         formData.append("file", file);
         formData.append("document_type", documentType);
 
-        Inertia.post(`/jobs/${job.id}/documents`, formData);
+        Inertia.post(`/jobs/${job.shipment_id}/documents`, formData, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setFile(null);
+                setDocumentType("Bill of Lading");
+                if (fileRef.current) fileRef.current.value = "";
+            }
+        });
     };
 
     const handleReplace = (attachmentId, file) => {
+        if (!file) return;
+
         const formData = new FormData();
         formData.append("file", file);
 
-        Inertia.post(`/jobs/${job.id}/documents/${attachmentId}/replace`, formData);
+        Inertia.post(`/jobs/${job.shipment_id}/documents/${attachmentId}/replace`, formData, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setFile(null);
+                setDocumentType("Bill of Lading");
+                if (fileRef.current) fileRef.current.value = "";
+            }
+        });
     };
 
     const columns = [
@@ -41,9 +65,12 @@ const DocumentUpload = ({ job, attachments , pageTitle }) => {
 
             {/* View Link */}
             <a
-                href={`http://sgp1.digitaloceanspaces.com/assets-kidcares/${row.file_path}`}
+                href={row.file_url || "#"}
                 target="_blank"
-                className="text-blue-600 underline text-sm"
+                rel="noopener noreferrer"
+                className={`underline ${
+                    row.file_url ? "text-blue-600" : "text-gray-400 pointer-events-none"
+                }`}
             >
                 View
             </a>
@@ -53,6 +80,7 @@ const DocumentUpload = ({ job, attachments , pageTitle }) => {
                 Replace
                 <input
                     type="file"
+                    ref={fileRef}
                     className="hidden"
                     onChange={(e) => handleReplace(row.id, e.target.files[0])}
                 />
@@ -69,7 +97,7 @@ const DocumentUpload = ({ job, attachments , pageTitle }) => {
                 <h1 className="text-lg font-semibold text-gray-800">
                     {pageTitle}
                 </h1>
-                <Link href={`/jobs/${job.id}/edit`}>Shipment Details</Link>
+                <Link href={`/jobs/${job.shipment_id}/edit`}>Shipment Details</Link>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow m-6">
@@ -90,7 +118,6 @@ const DocumentUpload = ({ job, attachments , pageTitle }) => {
                     required
                     onChange={(e) => setDocumentType(e.target.value)}
                 >
-                    <option value="">Select Document Type</option>
                     <option value="Bill of Lading">Bill of Lading</option>
                     <option value="Invoice">Invoice</option>
                     <option value="Delivery Order">Delivery Order</option>

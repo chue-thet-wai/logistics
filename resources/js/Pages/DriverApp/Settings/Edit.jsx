@@ -2,7 +2,17 @@ import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import { Link } from "@inertiajs/inertia-react";
 import { FaArrowLeft } from "react-icons/fa";
-import {FormWrapper,Label,Input,Button,Textarea,Select,} from "@/components";
+import {
+  FormWrapper,
+  Label,
+  Input,
+  Button,
+  Textarea,
+  Select,
+} from "@/components";
+
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/utils/lang";
 
 export default function Edit({
   driver,
@@ -10,15 +20,16 @@ export default function Edit({
   checkpoints = [],
   statuses = [],
 }) {
+
+  const { language } = useLanguage();
+  const t = translations[language];
+
   const [formData, setFormData] = useState({
     name: driver?.name || "",
     phone: driver?.phone || "",
-    truck_number: driver?.truck_number || "",
-    vehicle_type: driver?.vehicle_type || "",
     status: driver?.status || "0",
     route: driver?.route || "",
     checkpoint: driver?.checkpoint || "",
-    available: driver?.available ?? 1,
     remark: driver?.remark || "",
   });
 
@@ -64,7 +75,10 @@ export default function Edit({
           <FaArrowLeft />
         </Link>
 
-        <h1 className="text-lg font-semibold">Edit Driver</h1>
+        <h1 className="text-lg font-semibold">
+          {t.editDriver}
+        </h1>
+
         <div />
       </div>
 
@@ -76,7 +90,7 @@ export default function Edit({
 
             {/* Name */}
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t.name}</Label>
               <Input
                 id="name"
                 name="name"
@@ -89,7 +103,7 @@ export default function Edit({
 
             {/* Phone */}
             <div>
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{t.phone}</Label>
               <Input
                 id="phone"
                 name="phone"
@@ -99,66 +113,23 @@ export default function Edit({
               />
             </div>
 
-            {/* Truck Number */}
-            <div>
-              <Label htmlFor="truck_number">Truck Number</Label>
-              <Input
-                id="truck_number"
-                name="truck_number"
-                value={formData.truck_number}
-                onChange={handleChange}
-                error={errors.truck_number}
-              />
-            </div>
-
-            {/* Vehicle Type */}
-            <div>
-              <Label htmlFor="vehicle_type">Vehicle Type</Label>
-              <Input
-                id="vehicle_type"
-                name="vehicle_type"
-                value={formData.vehicle_type}
-                onChange={handleChange}
-                error={errors.vehicle_type}
-              />
-            </div>
-
             {/* Status */}
             <div>
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">{t.status}</Label>
               <Select
                 id="status"
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
                 options={statuses}
-                placeholder="Select Status"
+                placeholder={t.selectStatus}
                 error={errors.status}
-              />
-            </div>
-
-            {/* Availability */}
-            <div>
-              <Label htmlFor="available">Availability</Label>
-              <Select
-                name="available"
-                value={formData.available}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    available: Number(e.target.value),
-                  })
-                }
-                options={[
-                  { value: 1, label: "Available" },
-                  { value: 0, label: "Busy" },
-                ]}
               />
             </div>
 
             {/* Route */}
             <div>
-              <Label htmlFor="route">Route</Label>
+              <Label htmlFor="route">{t.route}</Label>
               <Select
                 name="route"
                 value={formData.route}
@@ -167,14 +138,14 @@ export default function Edit({
                   value: r.id,
                   label: r.name,
                 }))}
-                placeholder="Select Route"
+                placeholder={t.selectRoute}
                 error={errors.route}
               />
             </div>
 
             {/* Checkpoint */}
             <div>
-              <Label htmlFor="checkpoint">Checkpoint</Label>
+              <Label htmlFor="checkpoint">{t.checkpoint}</Label>
               <Select
                 name="checkpoint"
                 value={formData.checkpoint}
@@ -183,7 +154,7 @@ export default function Edit({
                   value: c.id,
                   label: c.name,
                 }))}
-                placeholder="Select Checkpoint"
+                placeholder={t.selectCheckpoint}
                 disabled={!formData.route}
                 error={errors.checkpoint}
               />
@@ -191,7 +162,7 @@ export default function Edit({
 
             {/* Remark */}
             <div>
-              <Label htmlFor="remark">Remark</Label>
+              <Label htmlFor="remark">{t.remark}</Label>
               <Textarea
                 id="remark"
                 name="remark"
@@ -211,17 +182,16 @@ export default function Edit({
               onClick={() => Inertia.visit("/driver/settings")}
               disabled={processing}
             >
-              Cancel
+              {t.cancel}
             </Button>
 
             <button
               type="submit"
               disabled={processing}
-              className={`w-full py-3 rounded-xl text-white bg-green-600`}
+              className="w-full py-3 rounded-xl text-white bg-green-600"
             >
-              {processing ? "Saving..." : "Save"}
+              {processing ? t.saving : t.save}
             </button>
-
           </div>
 
         </FormWrapper>

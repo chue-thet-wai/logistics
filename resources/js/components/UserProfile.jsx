@@ -61,7 +61,7 @@ const UserProfile = ({ user }) => {
           className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
         >
           <FiSettings className="text-gray-600" />
-          <span>{t.userSetting}</span>
+          <span>{t.settings}</span>
         </button>
         <button
           onClick={handleLogout}

@@ -9,8 +9,13 @@ class JobStatusLog extends Model
 {
     protected $guarded = [];
     
-   public function expenses()
+    public function driverexpenses()
     {
-        return $this->hasMany(JobExpense::class);
+        return $this->hasMany(JobDriverExpense::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

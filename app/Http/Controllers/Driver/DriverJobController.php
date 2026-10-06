@@ -93,6 +93,8 @@ class DriverJobController extends Controller
             'longitude' => $request->longitude,
             'notes'     => $request->notes,
             'photo'     => $photoPath,
+            'created_by' => Auth::user()->id,
+            'updated_by' => Auth::user()->id,
         ]);
 
         $job->update(['status' => $request->status]);
@@ -102,11 +104,11 @@ class DriverJobController extends Controller
                 ? $request->file('fuel.receipt')->store('logistics/expenses-fuel', 's3')
                 : null;
 
-            $log->expenses()->create([
+            $log->driverexpenses()->create([
                 'type' => 'fuel',
                 'station_name' => $request->fuel['station'],
                 'liter' => $request->fuel['liter'],
-                'amount' => $request->fuel['amount'],
+                'amount' => $request->fuel['amount'] ?? 0,
                 'receipt' => $fuelReceipt,
                 'notes'     => $request->fuel['note'],
             ]);
@@ -117,10 +119,10 @@ class DriverJobController extends Controller
                 ? $request->file('toll.receipt')->store('logistics/expenses-toll', 's3')
                 : null;
 
-            $log->expenses()->create([
+            $log->driverexpenses()->create([
                 'type' => 'toll',
                 'gate_name' => $request->toll['gate'],
-                'amount' => $request->toll['amount'],
+                'amount' => $request->toll['amount']?? 0,
                 'receipt' => $tollReceipt,
                 'notes'     => $request->toll['note'],
             ]);

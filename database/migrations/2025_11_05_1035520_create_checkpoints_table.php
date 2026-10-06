@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('checkpoints', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('checkpoint_id')->unique(); 
+            $table->string('name')->index();
             $table->foreignId('route_id')->nullable()->constrained('routes')->onDelete('set null');
-            $table->string('type')->nullable();
-            $table->string('eta')->nullable();
-            $table->string('latitude')->nullable();
-            $table->string('longitude')->nullable();
+            $table->string('type')->nullable()->index();
+            $table->string('eta')->nullable()->index();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->text('remark')->nullable();
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->unsignedBigInteger('updated_by')->nullable()->index();

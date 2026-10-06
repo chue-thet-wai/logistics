@@ -35,9 +35,9 @@ const Dashboard = ({ stats }) => {
   const t = translations[language];
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 m-6">
         <Link href="/shipments/active">
           <StatCard
             icon={<FaShippingFast size={16} />}

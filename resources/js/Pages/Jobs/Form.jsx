@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
+import { usePage } from "@inertiajs/inertia-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FormWrapper, Label, Input, Textarea, Select, Button } from "../../components";
+import { FormWrapper, Label, Input, Select, Button, SearchableSelect } from "../../components";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 const CollapsibleCard = ({ title, children, defaultOpen = true }) => {
@@ -39,64 +40,64 @@ const CollapsibleCard = ({ title, children, defaultOpen = true }) => {
     );
 };
 
-const JobForm = ({ job = null, customers, categories=[], routes=[], pageTitle }) => {
+const JobForm = ({
+    job = null,
+    customers = [],
+    categories = [],
+    modes = [],
+    loading_ports = [],
+    discharge_ports = [],
+    carriers = [],
+    consignees = [],
+    shipment_types = [],
+    bl_statuses = [],
+    free_day_types = [],
+    pageTitle
+}) => {
+
     const [formData, setFormData] = useState({
         shipment_id: job?.shipment_id || "",
-        booking_id: job?.booking_id || lead?.booking_id || "",
-        cus_id: job?.cus_id || lead?.cus_id || "",
-        mode: job?.mode || lead?.mode || "",
-        eta: job?.eta || lead?.eta || "",
-        containers: job?.containers || lead?.containers || "",
-        category: job?.category || lead?.category || "",
-        bl_number: job?.bl_number || lead?.bl_number || "",
-        free_day: job?.free_day || lead?.free_day || "",
-        origin: job?.origin || "",
-        destination: job?.destination || "",
-        shipment_type: job?.shipment_type || "",
-        // operational
-        operational_pickup_date: job?.operational_pickup_date || "",
-        operational_container_info: job?.operational_container_info || "",
-        operational_gatepass_info: job?.operational_gatepass_info || "",
-        operational_receiving_confirmation: job?.operational_receiving_confirmation || "",
-        // detention
-        detention_free_days: job?.detention_free_days || "",
-        detention_used_days: job?.detention_used_days || "",
-        detention_extra_days: job?.detention_extra_days || "",
-        detention_rate: job?.detention_rate || "",
-        detention_total: job?.detention_total || "",
-        detention_remark: job?.detention_remark || "",
-        // demurrage
-        demurrage_free_days: job?.demurrage_free_days || "",
-        demurrage_used_days: job?.demurrage_used_days || "",
-        demurrage_extra_days: job?.demurrage_extra_days || "",
-        demurrage_rate: job?.demurrage_rate || "",
-        demurrage_total: job?.demurrage_total || "",
-        demurrage_remark: job?.demurrage_remark || "",
+        booking_id: job?.booking_id || "",
+        cus_id: job?.cus_id || "",
+        mode: job?.mode ?? 2,
+        category: job?.category ?? 2,
+        eta: job?.eta || "",
+        si_number: job?.si_number || "",
+        loading_port: job?.loading_port ?? "",
+        discharge_port: job?.discharge_port ?? "",
+        master_bl_number: job?.master_bl_number || "",
+        house_bl_number: job?.house_bl_number || "",
+        forwarder: job?.forwarder || "",
+        carrier: job?.carrier ?? "",
+        shipper_name: job?.shipper_name || "",
+        consignee: job?.consignee ?? "",
+        type: job?.type ?? "",
+        bl_status: job?.bl_status ?? 3,
+        free_day_type: job?.free_day_type ?? 1,
+        surrendered_date: job?.surrendered_date || "",
     });
+
+    const [processing, setProcessing] = useState(false);
+    const { flash, errors } = usePage().props;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // When route changes, auto-fill origin & destination
-        if (name === "route_id") {
-            const selectedRoute = routes.find(r => r.id === parseInt(value));
-            setFormData(prev => ({
-                ...prev,
-                route_id: value,
-                origin: selectedRoute?.origin || "",
-                destination: selectedRoute?.destination || "",
-            }));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleSubmit = (e, submitType) => {
         e.preventDefault();
 
-        const payload = { ...formData, submitType };
+        const payload = {
+            ...formData,
+            submitType
+        };
 
-        const url = job ? `/jobs/${job.id}` : "/jobs";
+        const url = job ? `/jobs/${job.shipment_id}` : "/jobs";
         const method = job ? "put" : "post";
 
         Inertia[method](url, payload);
@@ -108,203 +109,242 @@ const JobForm = ({ job = null, customers, categories=[], routes=[], pageTitle })
                 <h1 className="text-lg font-semibold text-gray-800">{pageTitle}</h1>
             </div>
 
-            <FormWrapper onSubmit={handleSubmit}>
-                {/* Basic Shipment Info */}
+            {flash?.error && (
+                <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+                    {flash.error}
+                </div>
+            )}
+
+            <FormWrapper>
                 <CollapsibleCard title="Basic Shipment Information" defaultOpen>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
+
                         <div>
                             <Label>Shipment ID</Label>
                             <Input name="shipment_id" value={formData.shipment_id} disabled />
                         </div>
+
                         <div>
                             <Label>Booking ID</Label>
                             <Input name="booking_id" value={formData.booking_id} disabled />
                         </div>
+
                         <div>
-                            <Label>Customer</Label>
-                            <Select
+                            <Label required>Customer</Label>
+                            <SearchableSelect
                                 name="cus_id"
                                 value={formData.cus_id}
                                 onChange={handleChange}
-                                options={customers.map((c) => ({
+                                options={customers.map(c => ({
                                     value: c.cus_id,
-                                    label: c.name,
+                                    label: c.name
                                 }))}
+                                error={errors.cus_id}
                             />
                         </div>
+
                         <div>
-                            <Label>Shipment Category</Label>
-                            <Select
-                                id="category"
-                                name="category"
-                                value={formData.category}
-                                onChange={handleChange}
-                                options={categories}
-                            />
-                        </div>
-                       <div>
-                            <Label required>Mode</Label>
-                            <div className="flex gap-4 mt-1">
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        name="mode"
-                                        value="air"
-                                        checked={formData.mode === "air"}
-                                        onChange={handleChange}
-                                    />
-                                    Air
-                                </label>
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        name="mode"
-                                        value="sea"
-                                        checked={formData.mode === "sea"}
-                                        onChange={handleChange}
-                                    />
-                                    Sea
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <Label>ETA (Expected Arrival Date)</Label>
+                            <Label>ETA</Label>
                             <Input type="date" name="eta" value={formData.eta} onChange={handleChange} />
                         </div>
+
+                         {/* Mode */}
                         <div>
-                            <Label required>Route</Label>
-                            <Select
-                                name="route_id"
-                                value={formData.route_id}
+                            <Label required>Mode</Label>
+                            <div className="flex gap-4 mt-1 mb-1">
+                                <Select
+                                    id="mode"
+                                    name="mode"
+                                    value={formData.mode}
+                                    onChange={handleChange}
+                                    options={modes}
+                                    placeholder="Select Mode"
+                                    aria-invalid={!!errors.mode}
+                                    aria-describedby="mode-error"
+                                    error={errors.mode}
+                                />
+                            </div>
+                        </div>
+                        {/* Shipment Category */}
+                        <div>
+                            <Label required>Shipment Category</Label>
+
+                            <div className="flex gap-4 mt-1 mb-1">
+                                {categories.map((category) => (
+                                    <label key={category.value} className="flex items-center gap-1">
+                                        <input
+                                            type="radio"
+                                            name="category"
+                                            value={category.value}
+                                            checked={formData.category == category.value}
+                                            onChange={handleChange}
+                                        />
+                                        {category.label}
+                                    </label>
+                                ))}
+                            </div>
+
+                            {errors.category && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.category}
+                                </p>
+                            )}
+                        </div>                        
+
+                        <div>
+                            <Label>Port of Loading(Origin)</Label>
+                            <SearchableSelect
+                                name="loading_port"
+                                value={formData.loading_port}
                                 onChange={handleChange}
-                                options={routes.map(r => ({
-                                    value: r.id,
-                                    label: r.name
-                                }))}
+                                options={loading_ports}
+                                placeholder="Search loading port..."
+                                error={errors.loading_port}
                             />
                         </div>
-                        <div></div>
+
                         <div>
-                            <Label>Port of Loading (Origin)</Label>
-                            <Input name="origin" value={formData.origin} onChange={handleChange}  disabled/>
+                            <Label>Port of Discharge(Discharge)</Label>
+                            <SearchableSelect
+                                name="discharge_port"
+                                value={formData.discharge_port}
+                                onChange={handleChange}
+                                options={discharge_ports}
+                                placeholder="Search discharge port..."
+                                error={errors.discharge_port}
+                            />
                         </div>
+
                         <div>
-                            <Label>Port of Discharge (Destination)</Label>
-                            <Input name="destination" value={formData.destination} onChange={handleChange}  disabled/>
+                            <Label>Master BL Number</Label>
+                            <Input 
+                                name="master_bl_number" 
+                                value={formData.master_bl_number} 
+                                onChange={handleChange} 
+                                error={errors.master_bl_number}
+                            />
                         </div>
+
                         <div>
-                            <Label>BL Number</Label>
-                            <Input name="bl_number" value={formData.bl_number} onChange={handleChange} />
+                            <Label>House BL Number</Label>
+                            <Input 
+                                name="house_bl_number" 
+                                value={formData.house_bl_number}
+                                onChange={handleChange} 
+                                error={errors.house_bl_number}
+                            />
                         </div>
+
                         <div>
-                            <Label>Free Days</Label>
-                            <Input type="number" name="free_day" value={formData.free_day} onChange={handleChange} />
+                            <Label>Forwarder</Label>
+                            <Input name="forwarder" value={formData.forwarder} onChange={handleChange} />
                         </div>
+
+                        <div>
+                            <Label>SI Number</Label>
+                            <Input name="si_number" value={formData.si_number} onChange={handleChange} />
+                        </div>
+
+                        <div>
+                            <Label>Carrier</Label>
+                            <SearchableSelect
+                                name="carrier"
+                                value={formData.carrier}
+                                onChange={handleChange}
+                                options={carriers}
+                                placeholder="Search carrier..."
+                                error={errors.carrier}
+                            />
+                        </div>  
+
+                        <div>
+                            <Label required>Consignee</Label>
+                            <SearchableSelect
+                                name="consignee"
+                                value={formData.consignee}
+                                onChange={handleChange}
+                                options={consignees}
+                                placeholder="Search consignee..."
+                                error={errors.consignee}
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Shipper Name</Label>
+                            <Input name="shipper_name" value={formData.shipper_name} onChange={handleChange} />
+                        </div>
+
+                        <div>
+                            <Label required>Shipment Type</Label>
+                            <Select
+                                name="type"
+                                value={formData.type}
+                                onChange={handleChange}
+                                options={shipment_types}
+                                error={errors.type}
+                            />
+                        </div>
+
+                        <div>
+                            <Label required>BL Status</Label>
+                            <Select
+                                name="bl_status"
+                                value={formData.bl_status}
+                                onChange={handleChange}
+                                options={bl_statuses}
+                                error={errors.bl_status}
+                            />
+                        </div>
+
+                        <div>
+                            <Label required>Free Day Type</Label>
+                            <Select
+                                name="free_day_type"
+                                value={formData.free_day_type}
+                                onChange={handleChange}
+                                options={free_day_types}
+                                error={errors.free_day_type}
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Surrendered Date</Label>
+                            <Input type="date" name="surrendered_date" value={formData.surrendered_date} onChange={handleChange} />
+                        </div>
+
                     </div>
                 </CollapsibleCard>
 
-                {/* Operational Instructions */}
-                <CollapsibleCard title="Operational Instructions">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label>Pickup Date</Label>
-                            <Input type="date" name="operational_pickup_date" value={formData.operational_pickup_date} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Container Information</Label>
-                            <Input name="operational_container_info" value={formData.operational_container_info} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Gate Pass Info</Label>
-                            <Input name="operational_gatepass_info" value={formData.operational_gatepass_info} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Receiving Confirmation</Label>
-                            <Input name="operational_receiving_confirmation" value={formData.operational_receiving_confirmation} onChange={handleChange} />
-                        </div>
-                    </div>
-                </CollapsibleCard>
-
-                {/* Detention */}
-                <CollapsibleCard title="Detention Information">
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <Label>Free Days</Label>
-                            <Input name="detention_free_days" value={formData.detention_free_days} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Used Days</Label>
-                            <Input name="detention_used_days" value={formData.detention_used_days} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Extra Days</Label>
-                            <Input name="detention_extra_days" value={formData.detention_extra_days} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Rate</Label>
-                            <Input name="detention_rate" value={formData.detention_rate} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Total</Label>
-                            <Input name="detention_total" value={formData.detention_total} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Remarks</Label>
-                            <Input name="detention_remark" value={formData.detention_remark} onChange={handleChange} />
-                        </div>
-                    </div>
-                </CollapsibleCard>
-
-                {/* Demurrage */}
-                <CollapsibleCard title="Demurrage Information">
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <Label>Free Days</Label>
-                            <Input name="demurrage_free_days" value={formData.demurrage_free_days} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Used Days</Label>
-                            <Input name="demurrage_used_days" value={formData.demurrage_used_days} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Extra Days</Label>
-                            <Input name="demurrage_extra_days" value={formData.demurrage_extra_days} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Rate</Label>
-                            <Input name="demurrage_rate" value={formData.demurrage_rate} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Total</Label>
-                            <Input name="demurrage_total" value={formData.demurrage_total} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <Label>Remarks</Label>
-                            <Input name="demurrage_remark" value={formData.demurrage_remark} onChange={handleChange} />
-                        </div>
-                    </div>
-                </CollapsibleCard>
-
+                {/* BUTTONS — UNCHANGED */}
                 <div className="flex justify-end mt-6 space-x-3">
                     <Button type="button" variant="secondary" onClick={() => Inertia.visit("/jobs")}>
                         Cancel
                     </Button>
-                    <Button type="button" onClick={() => Inertia.visit(`/jobs/${job.id}/documents`)}>
-                        Document Attached
-                    </Button>
-                    <Button
-                        type="button"
-                        onClick={(e) => handleSubmit(e, "save")}
-                    >
-                        Save
-                    </Button>
 
-                    <Button
-                        type="button"
-                        onClick={(e) => handleSubmit(e, "continue")}
-                    >
-                        Save & Continue to Driver Assign
+                    {job && (
+                        <>
+                            <Button type="button" onClick={() => Inertia.visit(`/jobs/${job.shipment_id}/documents`)}>
+                                Document Attached
+                            </Button>
+
+                            <Button type="button" onClick={() => Inertia.visit(`/jobs/${job.shipment_id}/containers`)}>
+                                Container Information
+                            </Button>
+                        </>
+                    )}
+
+                    <Button type="button" disabled={processing}  onClick={(e) => handleSubmit(e, "save")}>
+                        {processing && formData.submitType === "save"
+                                                    ? "Saving..."
+                                                    : "Save"}
                     </Button>
+                    {job.status == 0 && (
+                        <Button type="button" disabled={processing} onClick={(e) => handleSubmit(e, "continue")}>
+                            {processing && formData.submitType === "continue"
+                                                        ? "Approving to Driver Assign"
+                                                        : "Approve to Driver Assign"}
+                        </Button>
+                    )}
                 </div>
             </FormWrapper>
         </div>

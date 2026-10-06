@@ -14,6 +14,7 @@ export {default as Modal} from './Modal'
 export {default as Camera} from './Camera'
 export { default as Navbar } from './Navbar';
 export { default as Select } from './Select';
+export { default as SearchableSelect } from './SearchableSelect';
 export { default as Sidebar } from './Sidebar';
 export { default as Table } from './Table';
 export { default as Textarea } from './Textarea';

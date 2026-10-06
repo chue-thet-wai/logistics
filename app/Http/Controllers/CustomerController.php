@@ -13,6 +13,7 @@ class CustomerController extends Controller
     public function index()
     {
         $customers = Customer::with('user')
+            ->latest()
             ->paginate(config('common.paginate_per_page'));
 
         return Inertia::render('Customers/Index', [
@@ -84,10 +85,7 @@ class CustomerController extends Controller
 
         $user->assignRole('Customer');
 
-        // Generate CUS-ID
-        $lastCustomer = Customer::orderBy('id', 'desc')->first();
-        $nextId = $lastCustomer ? $lastCustomer->id + 1 : 1;
-        $cus_id = 'CUS-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+        $cus_id = generateUniqueId('customers', 'cus_id');
 
         // Create customer
         Customer::create(array_merge(
@@ -177,15 +175,18 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
+        if ($customer->leads()->exists()) {
+            return back()->with('error', 'Cannot delete! Customer is used in leads.');
+        }
+
         $user = $customer->user;
 
-        $customer->delete();
+        $customer->forceDelete();
 
         if ($user) {
             $user->delete();
         }
 
-        return redirect()->route('customers.index')
-            ->with('success', 'Customer deleted successfully!');
+        return back()->with('success', 'Customer deleted successfully!');
     }
 }

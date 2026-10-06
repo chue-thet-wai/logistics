@@ -9,12 +9,15 @@ use App\Models\Checkpoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use App\Imports\DriversImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DriverController extends Controller
 {
     public function index()
     {
         $drivers = Driver::with('user')
+            ->latest()
             ->paginate(config('common.paginate_per_page'));
 
         return Inertia::render('Drivers/Index', [
@@ -39,18 +42,14 @@ class DriverController extends Controller
             'name'          => 'required|string|max:255',
             'email'         => 'required|email|unique:users,email',
             'password'      => 'required|min:6|confirmed',
-            'phone'         => 'nullable|string|max:20',
-            'truck_number'  => 'nullable|string|max:100',
-            'vehicle_type'  => 'nullable|string|max:100',
+            'phone'         => 'nullable|string',
             'status'        => 'nullable|string|max:50',
             'route'         => 'nullable|string|max:255',
             'checkpoint'    => 'nullable|string|max:255',
             'remark'        => 'nullable|string',
         ]);
 
-        $lastDriver = Driver::orderBy('id', 'desc')->first();
-        $nextNumber = $lastDriver ? intval(substr($lastDriver->driver_id, 3)) + 1 : 1;
-        $driverId = 'DRV' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+        $driverId = generateUniqueId('drivers', 'driver_id');
 
         $user = User::create([
             'name'       => $request->name,
@@ -66,8 +65,6 @@ class DriverController extends Controller
             'name'          => $request->name,
             'email'         => $request->email,
             'phone'         => $request->phone,
-            'truck_number'  => $request->truck_number,
-            'vehicle_type'  => $request->vehicle_type,
             'status'        => $request->status,
             'route'         => $request->route,
             'checkpoint'    => $request->checkpoint,
@@ -96,9 +93,7 @@ class DriverController extends Controller
             'name'          => 'required|string|max:255',
             'email'         => 'required|email|unique:users,email,' . $driver->user_id,
             'password'      => 'nullable|min:6|confirmed',
-            'phone'         => 'nullable|string|max:20',
-            'truck_number'  => 'nullable|string|max:100',
-            'vehicle_type'  => 'nullable|string|max:100',
+            'phone'         => 'nullable|string',
             'status'        => 'nullable|string|max:50',
             'route'         => 'nullable|string|max:255',
             'checkpoint'    => 'nullable|string|max:255',
@@ -121,8 +116,6 @@ class DriverController extends Controller
             'name'          => $request->name,
             'email'         => $request->email,
             'phone'         => $request->phone,
-            'truck_number'  => $request->truck_number,
-            'vehicle_type'  => $request->vehicle_type,
             'status'        => $request->status,
             'route'         => $request->route,
             'checkpoint'    => $request->checkpoint,
@@ -136,11 +129,32 @@ class DriverController extends Controller
 
     public function destroy(Driver $driver)
     {
+        if ($driver->trips()->exists()) {
+            return redirect()->route('drivers.index')
+                ->with('error', 'Cannot delete! Driver is used in trips.');
+        }
+
         $user = $driver->user;
-        $driver->delete();
-        if ($user) $user->delete();
+
+        $driver->forceDelete(); 
+
+        if ($user) {
+            $user->delete();
+        }
 
         return redirect()->route('drivers.index')
             ->with('success', 'Driver deleted successfully!');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls'
+        ]);
+
+        Excel::import(new DriversImport, $request->file('file'));
+
+        return redirect()->route('drivers.index')
+            ->with('success', 'Drivers imported successfully!');
     }
 }

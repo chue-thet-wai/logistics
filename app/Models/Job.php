@@ -11,6 +11,11 @@ class Job extends Model
 
     protected $guarded = [];
 
+    public function getRouteKeyName()
+    {
+        return 'shipment_id';
+    }
+
     public function lead()
     {
         return $this->belongsTo(Lead::class, 'booking_id', 'booking_id');
@@ -19,6 +24,11 @@ class Job extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'cus_id', 'cus_id');
+    }
+
+    public function containers()
+    {
+        return $this->hasMany(Container::class, 'shipment_id', 'shipment_id');
     }
 
     public function attachments()
@@ -31,22 +41,15 @@ class Job extends Model
         return $this->belongsTo(Route::class, 'route_id');
     }
 
-    public function driverAssignments()
+    public function createdByUser()
     {
-        return $this->hasMany(JobDriver::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function drivers()
+    public function updatedByUser()
     {
-        return $this->belongsToMany(Driver::class, 'job_drivers')
-                    ->withTimestamps();
+        return $this->belongsTo(User::class, 'updated_by');
     }
-
-    public function statusLogs()
-    {
-        return $this->hasMany(JobStatusLog::class);
-    }
-
 
 
 }

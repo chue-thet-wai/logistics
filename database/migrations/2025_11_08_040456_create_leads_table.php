@@ -14,26 +14,40 @@ return new class extends Migration
         Schema::create('leads', function (Blueprint $table) {
             $table->id();
             $table->string('booking_id')->unique();
-            $table->string('cus_id');
-            $table->string('mode')->nullable(); 
-            $table->integer('containers')->default(0);
-            $table->date('eta')->nullable();
-            $table->string('category')->nullable();
-            $table->string('bl_number')->nullable();
-            $table->integer('free_day')->default(0);
-            $table->integer('status')->default(0); //0 is pending and 1 is confirm
-            $table->unsignedBigInteger('created_by')->nullable()->index();
-            $table->unsignedBigInteger('updated_by')->nullable()->index();
 
-            $table->softDeletes();     
+            $table->string('cus_id')->index(); 
+
+            $table->integer('mode')->default(0)->index(); 
+            $table->integer('category')->default(0)->index(); 
+            $table->date('eta')->nullable()->index();
+
+            $table->string('master_bl_number')->nullable();
+            $table->string('house_bl_number')->nullable();
+
+            $table->string('forwarder')->nullable()->index();
+            $table->integer('demurrage_free_day')->default(0)->index();
+            $table->integer('detention_free_day')->default(0)->index();
+            $table->integer('total_container')->default(0)->index();
+            $table->integer('status')->default(0)->index();
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->softDeletes();
             $table->timestamps();
 
-            $table->foreign('cus_id')->references('cus_id')->on('customers')->onDelete('cascade');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->unique(['master_bl_number', 'deleted_at']);
+            $table->unique(['house_bl_number', 'deleted_at']);
+
+            $table->foreign('cus_id')
+                ->references('cus_id')
+                ->on('customers')
+                ->cascadeOnDelete();
+
             $table->index('created_at');
             $table->index('updated_at');
         });
+
     }
 
     /**

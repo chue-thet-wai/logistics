@@ -14,7 +14,9 @@ class RoleController extends Controller
     
     public function index()
     {
-        $roles = Role::where('name', '!=', 'Customer')->paginate(config('common.paginate_per_page')); 
+        $roles = Role::whereNotIn('name', ['Customer', 'Driver'])
+            ->latest()
+            ->paginate(config('common.paginate_per_page')); 
         return Inertia::render('Roles/Index', [
             'roles' => $roles,
             'pageTitle' => 'Roles'

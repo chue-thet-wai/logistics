@@ -84,6 +84,12 @@ class AssignDriverController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
+        $job->statusLogs()->create([
+            'status'    => 2,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
+        ]);
+
         return redirect()
             ->route('assign-driver.index')
             ->with('success', 'Driver assigned successfully.');

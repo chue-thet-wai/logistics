@@ -7,6 +7,7 @@ import { usePermissions } from '../../utils/usePermissions';
 
 const Index = ({ customers, statuses = [], customer_types=[] ,pageTitle }) => {
     const { props } = usePage();
+    const { flash } = props;
     const userPermissions = props.auth?.permissions || [];
 
     const [isModalOpen, setModalOpen] = useState(false);
@@ -30,7 +31,7 @@ const Index = ({ customers, statuses = [], customer_types=[] ,pageTitle }) => {
         { header: "Contact Person", field: 'contact_person' },
         { header: "Phone", field: 'phone' },
         { header: "Email", field: 'email' },
-        { header: "Credit Limit", render: (row) => `${row.credit_limit} ${row.currency}` },
+        //{ header: "Credit Limit", render: (row) => `${row.credit_limit} ${row.currency}` },
         {
             header: "Status",
             field: 'status',
@@ -96,6 +97,20 @@ const Index = ({ customers, statuses = [], customer_types=[] ,pageTitle }) => {
                     <Link href="/customers/create">+ New Customer</Link>
                 )}
             </div>
+
+            {/* 
+            {flash?.success && (
+                <div className="mx-6 mt-4 p-3 bg-green-100 text-green-800 rounded">
+                    {flash.success}
+                </div>
+            )}
+            */}
+
+            {flash?.error && (
+                <div className="mx-6 mt-4 p-3 bg-red-100 text-red-800 rounded">
+                    {flash.error}
+                </div>
+            )}
             
             <div className='px-6'>
                 <Table
@@ -104,7 +119,7 @@ const Index = ({ customers, statuses = [], customer_types=[] ,pageTitle }) => {
                     onPageChange={(page) => {
                         Inertia.get(`/customers?page=${page}`, { preserveState: true });
                     }}
-                    actions={(row) => <RowActions rowId={row.id} />}
+                    actions={(row) => <RowActions rowId={row.cus_id} />}
                 />
             </div>
 

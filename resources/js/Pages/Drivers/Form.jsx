@@ -8,8 +8,6 @@ const DriverForm = ({ driver = null, routes = [], checkpoints = [], statuses =[]
         name: driver?.name || '',
         email: driver?.email || '',
         phone: driver?.phone || '',
-        truck_number: driver?.truck_number || '',
-        vehicle_type: driver?.vehicle_type || '',
         status: driver?.status || '0',
         route: driver?.route || '',
         checkpoint: driver?.checkpoint || '',
@@ -33,7 +31,7 @@ const DriverForm = ({ driver = null, routes = [], checkpoints = [], statuses =[]
         setProcessing(true);
 
         const action = driver ? 'put' : 'post';
-        const url = driver ? `/drivers/${driver.id}` : '/drivers';
+        const url = driver ? `/drivers/${driver.driver_id}` : '/drivers';
 
         Inertia[action](url, formData, {
             onError: (errors) => { setErrors(errors); setProcessing(false); },
@@ -53,7 +51,7 @@ const DriverForm = ({ driver = null, routes = [], checkpoints = [], statuses =[]
 
                         {/* Name */}
                         <div>
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name" required>Name</Label>
                             <Input
                                 id="name"
                                 name="name"
@@ -66,7 +64,7 @@ const DriverForm = ({ driver = null, routes = [], checkpoints = [], statuses =[]
 
                         {/* Email */}
                         <div>
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email" required>Email</Label>
                             <Input
                                 id="email"
                                 name="email"
@@ -89,33 +87,9 @@ const DriverForm = ({ driver = null, routes = [], checkpoints = [], statuses =[]
                             />
                         </div>
 
-                        {/* Truck Number */}
-                        <div>
-                            <Label htmlFor="truck_number">Truck Number</Label>
-                            <Input
-                                id="truck_number"
-                                name="truck_number"
-                                value={formData.truck_number}
-                                onChange={handleChange}
-                                error={errors.truck_number}
-                            />
-                        </div>
-
-                        {/* Vehicle Type */}
-                        <div>
-                            <Label htmlFor="vehicle_type">Vehicle Type</Label>
-                            <Input
-                                id="vehicle_type"
-                                name="vehicle_type"
-                                value={formData.vehicle_type}
-                                onChange={handleChange}
-                                error={errors.vehicle_type}
-                            />
-                        </div>
-
                         {/* Status */}
                         <div>
-                            <Label htmlFor="status">Status</Label>
+                            <Label htmlFor="status" required>Status</Label>
                             <Select
                                 id="status"
                                 name="status"

@@ -5,7 +5,9 @@ const Input = ({
   name,
   type = 'text',
   value,
+  defaultValue,
   onChange,
+  onBlur, 
   placeholder = '',
   className = '',
   padding = 'px-4 py-2',
@@ -16,7 +18,7 @@ const Input = ({
   focusRing = 'focus:ring-2 focus:ring-blue-400 focus:border-transparent',
   error = '',
   disabled = false,
-  multiple = false, 
+  multiple = false,
   min = '0',
   max,
   step = '1',
@@ -42,11 +44,13 @@ const Input = ({
         id={id}
         name={name}
         {...(type === 'file' ? {} : { value })}
+        {...(defaultValue !== undefined ? { defaultValue } : {})}
         onChange={onChange}
+        onBlur={onBlur}
         placeholder={placeholder}
         className={inputClass}
         disabled={disabled}
-        multiple={type === 'file' ? multiple : undefined} 
+        multiple={type === 'file' ? multiple : undefined}
         min={min}
         max={max}
         step={step}

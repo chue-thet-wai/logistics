@@ -23,24 +23,24 @@ return new class extends Migration
             $table->string('contact_person')->nullable();
             $table->string('designation')->nullable();
             $table->string('email')->nullable()->unique();
-            $table->string('phone')->nullable();
-            $table->string('secondary_phone')->nullable();
+            $table->string('phone',20)->nullable();
+            $table->string('secondary_phone',20)->nullable();
             $table->string('whatsapp')->nullable();
 
             $table->text('billing_address')->nullable();
             $table->string('billing_country')->nullable();
             $table->string('billing_state')->nullable();
             $table->string('billing_city')->nullable();
-            $table->string('billing_zip')->nullable();
+            $table->string('billing_zip',20)->nullable();
 
             $table->text('shipping_address')->nullable();
             $table->string('shipping_country')->nullable();
             $table->string('shipping_state')->nullable();
             $table->string('shipping_city')->nullable();
-            $table->string('shipping_zip')->nullable();
+            $table->string('shipping_zip',20)->nullable();
 
             $table->decimal('credit_limit', 10, 2)->nullable();
-            $table->string('currency')->nullable();
+            $table->string('currency',10)->nullable();
             $table->string('payment_terms')->nullable();
             $table->string('tax_id')->nullable();
             $table->string('invoice_email')->nullable();

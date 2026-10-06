@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::whereHas('roles', function ($query) {
-            $query->where('name', 'Admin');
+            $query->whereNotIn('name', ['Customer', 'Driver']);
         })->with('roles')->paginate(config('common.paginate_per_page'));
     
         foreach ($users as $user) {
@@ -106,7 +106,9 @@ class UserController extends Controller
 
     private function getAvailableRoles()
     {
-        return Role::all()->pluck('name')->toArray(); 
+        return Role::whereNotIn('name', ['Customer', 'Driver'])
+            ->pluck('name')
+            ->toArray();
     }
 
 }

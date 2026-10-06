@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('job_attachments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('job_id');
-            $table->string('document_type');
-            $table->string('file_name');
-            $table->string('file_path');
+            $table->string('document_type',50)->index();
+            $table->string('file_name')->index();
+            $table->string('file_path')->index();
             $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->unsignedBigInteger('updated_by')->nullable()->index();
             $table->timestamps();

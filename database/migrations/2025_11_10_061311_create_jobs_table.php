@@ -11,56 +11,50 @@ return new class extends Migration
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
 
-            $table->string('shipment_id')->nullable()->index();
+            $table->string('shipment_id')->index();
             $table->string('booking_id')->index();
             $table->string('cus_id')->index();
-            $table->string('mode')->nullable()->index();
-            $table->integer('containers')->default(0);
-            $table->date('eta')->nullable()->index();
-            $table->string('category')->nullable()->index();
-            $table->string('bl_number')->nullable()->index();
-            $table->integer('free_day')->default(0);
 
-            $table->unsignedBigInteger('route_id')->nullable()->index();
-            $table->string('origin')->nullable();
-            $table->string('destination')->nullable();
-            $table->string('shipment_type')->nullable();
-            $table->integer('status')->default(0)->index();
+            $table->integer('mode')->default(1); 
+            $table->integer('category')->default(1); 
+            $table->date('eta')->nullable();
+            $table->string('si_number')->nullable();
+            $table->integer('loading_port')->nullable();
+            $table->integer('discharge_port')->nullable();
 
-            // Operational
-            $table->text('operational_pickup_date')->nullable();
-            $table->text('operational_container_info')->nullable();
-            $table->text('operational_gatepass_info')->nullable();
-            $table->text('operational_receiving_confirmation')->nullable();
+            $table->string('master_bl_number')->nullable();
+            $table->string('house_bl_number')->nullable();
 
-            // Detention
-            $table->integer('detention_free_days')->nullable();
-            $table->integer('detention_used_days')->nullable();
-            $table->string('detention_extra_days')->nullable();
-            $table->string('detention_rate')->nullable();
-            $table->string('detention_total')->nullable();
-            $table->text('detention_remark')->nullable();
+            $table->string('forwarder')->nullable();
+            $table->integer('carrier')->nullable();
+            $table->integer('total_container')->default(0);
+            $table->string('shipper_name')->nullable();
+            $table->integer('consignee')->nullable();
+            $table->integer('type')->nullable();
+            $table->integer('bl_status')->nullable();
+            $table->integer('free_day_type')->nullable();
+            $table->date('surrendered_date')->nullable();
+            $table->integer('status')->default(0)->index(); 
 
-            // Demurrage
-            $table->integer('demurrage_free_days')->nullable();
-            $table->integer('demurrage_used_days')->nullable();
-            $table->string('demurrage_extra_days')->nullable();
-            $table->string('demurrage_rate')->nullable();
-            $table->string('demurrage_total')->nullable();
-            $table->text('demurrage_remark')->nullable();
-
-            $table->unsignedBigInteger('created_by')->nullable()->index();
-            $table->unsignedBigInteger('updated_by')->nullable()->index();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
 
             $table->softDeletes();
             $table->timestamps();
 
+            $table->unique(['master_bl_number', 'deleted_at']);
+            $table->unique(['house_bl_number', 'deleted_at']);
+
             // Foreign keys
-            $table->foreign('cus_id')->references('cus_id')->on('customers')->onDelete('cascade');
-            $table->foreign('booking_id')->references('booking_id')->on('leads')->onDelete('cascade');
-            $table->foreign('route_id')->references('id')->on('routes')->onDelete('set null');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('cus_id')
+                ->references('cus_id')
+                ->on('customers')
+                ->cascadeOnDelete();
+
+            $table->foreign('booking_id')
+                ->references('booking_id')
+                ->on('leads')
+                ->cascadeOnDelete();
         });
     }
 

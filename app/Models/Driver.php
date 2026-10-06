@@ -11,20 +11,19 @@ class Driver extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+
+    public function getRouteKeyName()
+    {
+        return 'driver_id';
+    }
     
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function jobAssignments()
+    public function trips()
     {
-        return $this->hasMany(JobDriver::class);
-    }
-
-    public function jobs()
-    {
-        return $this->belongsToMany(Job::class, 'job_drivers')
-                    ->withTimestamps();
+        return $this->hasMany(Trip::class);
     }
 }

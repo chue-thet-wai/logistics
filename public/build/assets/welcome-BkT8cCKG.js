@@ -1,0 +1,1 @@
+import{j as e}from"./app-DdNz8GoR.js";function n(){return e.jsx(e.Fragment,{children:e.jsx("div",{className:"flex justify-center items-center min-h-screen bg-gray-100",children:e.jsx("h1",{className:"text-4xl font-bold text-blue-500",children:"Welcome to Laravel with React and Tailwind CSS!"})})})}export{n as default};

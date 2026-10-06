@@ -12,21 +12,21 @@ class DriverDashboardController extends Controller
     {
         $driver = Auth::user()->driver;
 
-        $new = $driver->jobs()
-            ->where('status', 2)
+        $new = $driver->trips()
+            ->where('status', 0)
             ->count();
 
-        $active = $driver->jobs()
-            ->whereIn('status', [3, 4, 5, 6])
+        $active = $driver->trips()
+            ->whereIn('status', [2, 3, 4, 5, 6,7,8])
             ->count();
 
-        $done = $driver->jobs()
-            ->where('status', 7)
+        $done = $driver->trips()
+            ->where('status', 9)
             ->count();
 
-        // Latest upcoming jobs
-        $jobs = $driver->jobs()
-            ->orderBy('eta', 'asc')
+        // Latest upcoming trips
+        $trips = $driver->trips()
+            ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
@@ -35,8 +35,8 @@ class DriverDashboardController extends Controller
             'new'       => $new,
             'active'    => $active,
             'done'      => $done,
-            'statuses'  => config('common.job_statuses'),
-            'jobs'      => $jobs,
+            'statuses'  => config('common.trip_statuses'), 
+            'trips'    => $trips, 
         ]);
     }
 }

@@ -50,13 +50,10 @@ class DriverSettingController extends Controller
 
         $validated = $request->validate([
             'name'          => 'required|string|max:255',
-            'phone'         => 'nullable|string|max:50',
-            'truck_number'  => 'nullable|string|max:50',
-            'vehicle_type'  => 'nullable|string|max:100',
+            'phone'         => 'nullable|string',
             'status'        => 'nullable|string|max:50',
             'route'         => 'nullable|integer',
             'checkpoint'    => 'nullable|integer',
-            'available'     => 'required|boolean',
             'remark'        => 'nullable|string',
         ]);
 

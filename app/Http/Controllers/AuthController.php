@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -25,7 +26,10 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
             $user = Auth::user();
@@ -68,7 +72,16 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+
+        // Invalidate remember token
+        if ($user) {
+            $user->remember_token = Str::random(60);
+            $user->save();
+        }
+
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

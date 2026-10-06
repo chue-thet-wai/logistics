@@ -12,6 +12,7 @@ class RouteController extends Controller
     public function index()
     {
         $routes = Route::withCount('checkpoints')
+                    ->latest()
                     ->paginate(config('common.paginate_per_page'));
 
         return Inertia::render('Routes/Index', [
@@ -40,7 +41,8 @@ class RouteController extends Controller
             'status' => 'required|integer|in:0,1',
             'remark' => 'nullable|string',
         ]);
-
+        $routeId = generateUniqueId('routes', 'route_id');
+        $validated['route_id'] = $routeId;
         $validated['created_by'] = auth()->id();
 
         Route::create($validated);
@@ -50,8 +52,6 @@ class RouteController extends Controller
 
     public function edit(Route $routeModel)
     {
-        Log::info('routemodal');
-        Log::info($routeModel);
         return Inertia::render('Routes/Form', [
             'route' => $routeModel,
             'statuses' => config('common.statuses'),
@@ -80,9 +80,21 @@ class RouteController extends Controller
 
     public function destroy(Route $routeModel)
     {
+        $isUsedInDrivers = \App\Models\Driver::where('route', $routeModel->id)->exists();
+
+        $isUsedInContainers = \App\Models\Container::where('route_id', $routeModel->id)->exists();
+
+        if ($isUsedInDrivers || $isUsedInContainers) {
+            return redirect()
+                ->route('transport-routes.index')
+                ->with('error', 'This route is already in use and cannot be deleted.');
+        }
+
         $routeModel->delete();
 
-        return redirect()->route('transport-routes.index')->with('success', 'Route deleted successfully!');
+        return redirect()
+            ->route('transport-routes.index')
+            ->with('success', 'Route deleted successfully!');
     }
 
 }

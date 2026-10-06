@@ -7,6 +7,7 @@ import { usePermissions } from '../../utils/usePermissions';
 
 const RoutesIndex = ({ routes, statuses=[], pageTitle}) => {
     const { props } = usePage();
+    const { flash } = props;
     const userPermissions = props.auth?.permissions || [];
 
     const [isModalOpen, setModalOpen] = useState(false);
@@ -81,6 +82,19 @@ const RoutesIndex = ({ routes, statuses=[], pageTitle}) => {
                     <Link href="/transport-routes/create">+ New Route</Link>
                 )}
             </div>
+            {/* 
+            {flash?.success && (
+                <div className="mx-6 mt-4 p-3 bg-green-100 text-green-800 rounded">
+                    {flash.success}
+                </div>
+            )}
+            */}
+
+            {flash?.error && (
+                <div className="mx-6 mt-4 p-3 bg-red-100 text-red-800 rounded">
+                    {flash.error}
+                </div>
+            )}
 
             <div className="px-6">
                 <Table

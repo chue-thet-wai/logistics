@@ -8,19 +8,26 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/utils/lang";
+
 export default function DriverDashboard({
   pageTitle,
-  new: newJobs,
+  new: newTrips,
   active,
   done,
-  jobs = [],
+  trips = [],
   statuses = [],
 }) {
+
   const { auth } = usePage().props;
   const user = auth?.user;
 
+  const { language, changeLanguage } = useLanguage();
+  const t = translations[language];
+
   const statusMap = statuses.reduce((map, s) => {
-    map[s.value] = s.label;
+    map[s.value] = language === 'th' ? s.label_th : s.label;
     return map;
   }, {});
 
@@ -33,6 +40,8 @@ export default function DriverDashboard({
     5: "bg-cyan-200 text-cyan-700",
     6: "bg-orange-200 text-orange-700",
     7: "bg-green-200 text-green-700",
+    8: "bg-green-200 text-green-700",
+    9: "bg-green-200 text-green-700",
   };
 
   const [openMenu, setOpenMenu] = useState(false);
@@ -50,76 +59,114 @@ export default function DriverDashboard({
 
   return (
     <div className="min-h-screen bg-gray-100">
+
+      {/* HEADER */}
       <div className="px-4 pt-6 pb-4 flex justify-between items-center bg-white shadow fixed top-0 left-0 right-0 z-10 h-20">
-        <h1 className="text-lg font-semibold">Hi, {user?.name}</h1>
+        
+        <h1 className="text-lg font-semibold truncate w-full">
+          {t.hi}, {user?.name}
+        </h1>
 
-        <div className="relative" ref={menuRef}>
-          <img
-            src={user?.avatar || "/assets/images/profile.jpg"}
-            onClick={() => setOpenMenu(!openMenu)}
-            className="w-10 h-10 rounded-full cursor-pointer"
-          />
+        <div className="flex items-center gap-3">
 
-          {openMenu && (
-            <div className="absolute right-0 mt-3 w-40 bg-white rounded-xl shadow border">
-              <Link
-                href="/driver/settings"
-                className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-gray-100"
-              >
-                <FaCog /> Settings
-              </Link>
 
-              <Link
-                href="/logout"
-                method="post"
-                as="button"
-                className="w-full text-left flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50"
-              >
-                <FaSignOutAlt /> Logout
-              </Link>
-            </div>
-          )}
+          <div className="relative" ref={menuRef}>
+            <img
+              src={user?.avatar || "/assets/images/profile.jpg"}
+              onClick={() => setOpenMenu(!openMenu)}
+              className="w-10 h-10 rounded-full cursor-pointer"
+              alt="profile"
+            />
+
+            {openMenu && (
+              <div className="absolute right-0 mt-3 w-40 bg-white rounded-xl shadow border">
+                
+                <Link
+                  href="/driver/settings"
+                  className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-gray-100"
+                >
+                  <FaCog /> {t.settings}
+                </Link>
+
+                <Link
+                  href="/logout"
+                  method="post"
+                  as="button"
+                  className="w-full text-left flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50"
+                >
+                  <FaSignOutAlt /> {t.logout}
+                </Link>
+
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       <div className="px-4 py-4 pt-24">
-    
+
+        {/* Welcome Card */}
         <div className="bg-white p-4 rounded-xl shadow mb-4">
-          <h2 className="font-semibold">Welcome, {user?.name}</h2>
-          <p className="text-sm text-gray-500">Here is your delivery summary.</p>
+          <h2 className="font-semibold truncate w-full">
+            {t.welcome}, {user?.name}
+          </h2>
+          <p className="text-sm text-gray-500">
+            {t.summaryText}
+          </p>
         </div>
 
-       
+        {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-3">
-          <Link href="/driver/jobs?tab=new" className="bg-blue-500 text-white p-3 rounded-xl text-center">
+          <Link
+            href="/driver/trips?tab=new"
+            className="bg-blue-500 text-white p-3 rounded-xl text-center"
+          >
             <FaBoxOpen className="mx-auto" />
-            <p>{newJobs} New</p>
+            <p>{newTrips} {t.new}</p>
           </Link>
 
-          <Link href="/driver/jobs?tab=ongoing" className="bg-green-500 text-white p-3 rounded-xl text-center">
+          <Link
+            href="/driver/trips?tab=ongoing"
+            className="bg-green-500 text-white p-3 rounded-xl text-center"
+          >
             <FaTruckMoving className="mx-auto" />
-            <p>{active} Active</p>
+            <p>{active} {t.active}</p>
           </Link>
 
-          <Link href="/driver/jobs?tab=completed" className="bg-gray-500 text-white p-3 rounded-xl text-center">
+          <Link
+            href="/driver/trips?tab=completed"
+            className="bg-gray-500 text-white p-3 rounded-xl text-center"
+          >
             <FaCheck className="mx-auto" />
-            <p>{done} Done</p>
+            <p>{done} {t.done}</p>
           </Link>
         </div>
 
+        {/* Latest Trips */}
         <div className="mt-6">
-          <h3 className="font-semibold mb-2">Today's Deliveries</h3>
+          <h3 className="font-semibold mb-2">
+            {t.latestTrips}
+          </h3>
 
-          {jobs.map((job) => (
-            <div key={job.id} className="bg-white rounded-xl shadow p-4 mb-3">
-              <h4 className="font-bold">{job.shipment_id}</h4>
-              <p className="text-sm text-gray-600">
-                {job.origin} → {job.destination}
-              </p>
+          {trips.map((trip) => (
+            <div key={trip.id} className="bg-white rounded-xl shadow p-4 mb-3">
+              <h4 className="font-bold">
+                {trip.trip_no ?? `${t.trip} # ${trip.trip_id}`}
+              </h4>
+
+              {trip.origin && trip.destination && (
+                <p className="text-sm text-gray-600">
+                  {trip.origin} → {trip.destination}
+                </p>
+              )}
 
               <div className="flex justify-between items-center mt-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor[job.status]}`}>
-                  {statusMap[job.status]}
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    statusColor[trip.status]
+                  }`}
+                >
+                  {statusMap[trip.status]}
                 </span>
                 <FaTruckMoving className="text-blue-500" />
               </div>
@@ -127,9 +174,13 @@ export default function DriverDashboard({
           ))}
         </div>
 
-        <Link href="/driver/jobs" className="text-blue-600 text-sm font-medium mt-2 mb-6 block px-2 py-6" > 
-            View All Jobs → 
+        <Link
+          href="/driver/trips"
+          className="text-blue-600 text-sm font-medium mt-2 mb-6 block px-2 py-6"
+        >
+          {t.viewAllTrips} →
         </Link>
+
       </div>
     </div>
   );

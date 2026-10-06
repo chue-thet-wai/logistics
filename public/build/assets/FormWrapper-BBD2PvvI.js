@@ -1,0 +1,1 @@
+import{j as x}from"./app-DdNz8GoR.js";const n=({children:r,onSubmit:s,className:o="",padding:p="p-6",bgColor:a="bg-white",rounded:e="rounded-lg",shadow:t="shadow-[0_2px_10px_rgba(0,0,0,0.1)]",spacing:m="space-y-4"})=>x.jsx("form",{onSubmit:s,className:`${a} ${p} ${e} ${t} ${m} ${o} `,children:r});export{n as F};

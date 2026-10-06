@@ -6,6 +6,7 @@ import { usePage } from '@inertiajs/inertia-react';
 
 const Index = ({ drivers, pageTitle }) => {
     const { props } = usePage();
+    const { flash } = props;
     const userPermissions = props.auth?.permissions || [];
 
     const [isModalOpen, setModalOpen] = useState(false);
@@ -75,12 +76,26 @@ const Index = ({ drivers, pageTitle }) => {
                 )}
             </div>
 
+            {/* 
+            {flash?.success && (
+                <div className="mx-6 mt-4 p-3 bg-green-100 text-green-800 rounded">
+                    {flash.success}
+                </div>
+            )}
+            */}
+
+            {flash?.error && (
+                <div className="mx-6 mt-4 p-3 bg-red-100 text-red-800 rounded">
+                    {flash.error}
+                </div>
+            )}
+
             <div className='px-6'>
                 <Table
                     columns={columns}
                     tableData={drivers}
                     onPageChange={(page) => { Inertia.get(`/drivers?page=${page}`, { preserveState: true }); }}
-                    actions={(row) => <RowActions rowId={row.id} />}
+                    actions={(row) => <RowActions rowId={row.driver_id} />}
                 />
             </div>
 

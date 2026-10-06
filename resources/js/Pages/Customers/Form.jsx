@@ -54,7 +54,7 @@ const CustomerForm = ({ customer = null, statuses = [], customer_types=[], pageT
         setProcessing(true);
         setErrors({});
 
-        const url = customer ? `/customers/${customer.id}` : "/customers";
+        const url = customer ? `/customers/${customer.cus_id}` : "/customers";
         const method = customer ? "put" : "post";
 
         Inertia[method](url, formData, {
@@ -93,7 +93,7 @@ const CustomerForm = ({ customer = null, statuses = [], customer_types=[], pageT
                         </div>
 
                         <div>
-                            <Label htmlFor="customer_type">Customer Type</Label>
+                            <Label htmlFor="customer_type" required>Customer Type</Label>
                             <Select
                                 id="customer_type"
                                 name="customer_type"
@@ -108,7 +108,7 @@ const CustomerForm = ({ customer = null, statuses = [], customer_types=[], pageT
                         </div>
 
                         <div>
-                            <Label htmlFor="status">Status</Label>
+                            <Label htmlFor="status" required>Status</Label>
                             <Select
                                 id="status"
                                 name="status"
@@ -140,7 +140,7 @@ const CustomerForm = ({ customer = null, statuses = [], customer_types=[], pageT
                         </div>
 
                         <div>
-                            <Label>Email</Label>
+                            <Label required>Email</Label>
                             <Input name="email" type="email" value={formData.email} onChange={handleChange} error={errors.email} />
                         </div>
 

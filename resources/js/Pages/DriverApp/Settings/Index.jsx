@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { FaArrowLeft, FaEdit, FaChevronRight } from "react-icons/fa";
+import { FaEnvelope, FaPhone } from "react-icons/fa";
 import { Link } from "@inertiajs/inertia-react";
 
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/utils/lang";
+
+
 export default function DriverSettings({ driver }) {
-  const [language, setLanguage] = useState("English");
+
+  const { language, changeLanguage } = useLanguage();
+  const t = translations[language];
+
   const [notifications, setNotifications] = useState(true);
 
   const initials = driver?.name
@@ -19,7 +27,10 @@ export default function DriverSettings({ driver }) {
           <FaArrowLeft />
         </Link>
 
-        <h1 className="text-lg font-semibold">Settings</h1>
+        {/* ✅ translated */}
+        <h1 className="text-lg font-semibold">
+          {t.settings}
+        </h1>
 
         <Link href="/driver/settings/edit">
           <FaEdit size={18} />
@@ -34,9 +45,15 @@ export default function DriverSettings({ driver }) {
             {initials}
           </div>
 
-          <h2 className="mt-3 font-semibold">{driver?.name}</h2>
-          <p className="text-gray-500">Truck: {driver?.truck_number}</p>
-          <p className="text-gray-500">📞 {driver?.phone}</p>
+          <h2 className="mt-3 font-semibold truncate w-full text-center">
+            {driver?.name}
+          </h2>       
+          <p className="text-gray-500 flex items-center gap-2">
+            <FaPhone /> {driver?.phone}
+          </p>
+          <p className="text-gray-500 flex items-center gap-2">
+            <FaEnvelope /> {driver?.email}
+          </p>
         </div>
 
         {/* SETTINGS */}
@@ -44,16 +61,30 @@ export default function DriverSettings({ driver }) {
 
           {/* LANGUAGE */}
           <div className="flex items-center justify-between px-4 py-4">
-            <span className="font-medium">Language</span>
-            <div className="flex items-center gap-2 text-gray-500">
-              <span>{language}</span>
+            <span className="font-medium">
+              {t.language}
+            </span>
+
+            {/* ✅ toggle language */}
+            <div
+              onClick={() =>
+                changeLanguage(language === "en" ? "th" : "en")
+              }
+              className="flex items-center gap-2 text-gray-500 cursor-pointer"
+            >
+              <span>
+                {language === "en" ? "English" : "ไทย"}
+              </span>
               <FaChevronRight size={14} />
             </div>
           </div>
 
           {/* NOTIFICATIONS */}
           <div className="flex items-center justify-between px-4 py-4">
-            <span className="font-medium">Notifications</span>
+            <span className="font-medium">
+              {t.notifications}
+            </span>
+
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -68,7 +99,9 @@ export default function DriverSettings({ driver }) {
 
           {/* VERSION */}
           <div className="flex items-center justify-between px-4 py-4">
-            <span className="font-medium">App Version</span>
+            <span className="font-medium">
+              {t.version}
+            </span>
             <span className="text-gray-500">v2.0</span>
           </div>
         </div>
@@ -81,7 +114,7 @@ export default function DriverSettings({ driver }) {
             as="button"
             className="w-full py-3 text-red-600 border border-red-600 rounded-xl"
           >
-            Logout
+            {t.logout}
           </Link>
         </div>
       </div>

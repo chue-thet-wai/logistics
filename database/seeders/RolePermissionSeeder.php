@@ -32,6 +32,11 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Edit Drivers', 'route' => 'drivers.edit'],
             ['name' => 'Delete Drivers', 'route' => 'drivers.destroy'],
 
+            ['name' => 'View Trucks', 'route' => 'trucks.index'],
+            ['name' => 'Create Trucks', 'route' => 'trucks.create'],
+            ['name' => 'Edit Trucks', 'route' => 'trucks.edit'],
+            ['name' => 'Delete Trucks', 'route' => 'trucks.destroy'],
+
             ['name' => 'View Routes', 'route' => 'transport-routes.index'],
             ['name' => 'Create Routes', 'route' => 'transport-routes.create'],
             ['name' => 'Edit Routes', 'route' => 'transport-routes.edit'],
@@ -47,10 +52,33 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Edit Jobs', 'route' => 'jobs.edit'],
             ['name' => 'Delete Jobs', 'route' => 'jobs.destroy'],
 
-            ['name' => 'View Assign Driver', 'route' => 'assign-driver.index'],
-            ['name' => 'Create Assign Driver', 'route' => 'assign-driver.create'],
-            ['name' => 'Edit Assign Driver', 'route' => 'assign-driver.edit'],
-            ['name' => 'Delete Assign Driver', 'route' => 'assign-driver.destroy'],
+            ['name' => 'View Trips', 'route' => 'trips.index'],
+            ['name' => 'Create Trips', 'route' => 'trips.create'],
+            ['name' => 'Edit Trips', 'route' => 'trips.edit'],
+            ['name' => 'Delete Trips', 'route' => 'trips.destroy'],
+
+            ['name' => 'View Charges', 'route' => 'charges.index'],
+            ['name' => 'Create Charges', 'route' => 'charges.create'],
+            ['name' => 'Edit Charges', 'route' => 'charges.edit'],
+            ['name' => 'Delete Charges', 'route' => 'charges.destroy'],
+
+            ['name' => 'View Activity Log', 'route' => 'activity-log.index'],
+            ['name' => 'Create Activity Log', 'route' => 'activity-log.create'],
+            ['name' => 'Edit Activity Log', 'route' => 'activity-log.edit'],
+            ['name' => 'Delete Activity Log', 'route' => 'activity-log.destroy'],
+
+            ['name' => 'View Trip Progress', 'route' => 'trip-progress.index'],
+            ['name' => 'Create Trip Progress', 'route' => 'trip-progress.create'],
+            ['name' => 'Edit Trip Progress', 'route' => 'trip-progress.edit'],
+            ['name' => 'Delete Trip Progress', 'route' => 'trip-progress.destroy'],
+
+            ['name' => 'View POD Upload', 'route' => 'pod-upload.index'],
+            ['name' => 'Create POD Upload', 'route' => 'pod-upload.create'],
+            ['name' => 'Edit POD Upload', 'route' => 'pod-upload.edit'],
+            ['name' => 'Delete POD Upload', 'route' => 'pod-upload.destroy'],
+
+            ['name' => 'View Incoming Shipment Tracking', 'route' => 'incoming-shipment-tracking.index'],
+            ['name' => 'Export Incoming Shipment Tracking', 'route' => 'incoming-shipment-tracking.export'],
 
         ];
 
@@ -68,10 +96,16 @@ class RolePermissionSeeder extends Seeder
             'View Users', 'Create Users', 'Edit Users', 'Delete Users',
             'View Customers', 'Create Customers', 'Edit Customers', 'Delete Customers',
             'View Drivers', 'Create Drivers', 'Edit Drivers', 'Delete Drivers',
+            'View Trucks', 'Create Trucks', 'Edit Trucks', 'Delete Trucks',
             'View Routes', 'Create Routes', 'Edit Routes', 'Delete Routes',
             'View Leads', 'Create Leads', 'Edit Leads', 'Delete Leads',
             'View Jobs', 'Create Jobs', 'Edit Jobs', 'Delete Jobs',
-            'View Assign Driver', 'Create Assign Driver', 'Edit Assign Driver', 'Delete Assign Driver',
+            'View Trips', 'Create Trips', 'Edit Trips', 'Delete Trips',
+            'View Charges', 'Create Charges', 'Edit Charges', 'Delete Charges',
+            'View Activity Log', 'Create Activity Log', 'Edit Activity Log', 'Delete Activity Log',
+            'View Trip Progress', 'Create Trip Progress', 'Edit Trip Progress', 'Delete Trip Progress',
+            'View POD Upload', 'Create POD Upload', 'Edit POD Upload', 'Delete POD Upload',
+            'View Incoming Shipment Tracking','Export Incoming Shipment Tracking'
         ];
         $adminRole = Role::firstOrCreate(['name' => 'Admin']);
         $adminRole->syncPermissions($adminPermissions);

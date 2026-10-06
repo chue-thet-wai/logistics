@@ -13,7 +13,7 @@ class CheckpointController extends Controller
     public function index(Route $route)
     {
         $checkpoints = $route->checkpoints()
-                        ->orderBy('id')
+                        ->orderBy('created_at','desc')
                         ->paginate(config('common.paginate_per_page'));
         return Inertia::render('Checkpoints/Index', [
             'route' => $route,
@@ -42,7 +42,8 @@ class CheckpointController extends Controller
             'longitude' => 'nullable|string|max:50',
             'remark' => 'nullable|string',
         ]);
-
+        $checkpointId = generateUniqueId('checkpoints', 'checkpoint_id');
+        $validated['checkpoint_id'] = $checkpointId;
         $validated['route_id'] = $route->id;
         $validated['created_by'] = auth()->id();
 
